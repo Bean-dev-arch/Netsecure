@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affaires en cours</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        table {
+            width: 80%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: red;
+        }
+        .delete-button:hover {
+            background-color: darkred;
+        }
+        .create-case-form {
+            margin-top: 20px;
+            width: 50%;
+            display: none;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Affaires en cours</h1>
+
+<!-- Tableau des affaires en cours -->
+<table id="affaires-table">
+    <thead>
+        <tr>
+            <th>Nom de l'affaire</th>
+            <th>Niveau d'accréditation requis</th>
+            <th>Créateur</th>
+            <th>Date de création</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="affaires-list">
+        <!-- Les affaires seront affichées ici -->
+    </tbody>
+</table>
+
+<!-- Bouton pour créer une nouvelle affaire -->
+<button id="create-case-btn">Créer une nouvelle affaire</button>
+
+<!-- Formulaire pour créer une affaire -->
+<div class="create-case-form" id="create-case-form">
+    <h3>Nouvelle affaire</h3>
+    <label for="case-name">Nom de l'affaire :</label>
+    <input type="text" id="case-name" placeholder="Nom de l'affaire" required>
+
+    <label for="case-accreditation">Niveau d'accréditation requis :</label>
+    <select id="case-accreditation" required>
+        <option value="1">Niveau 1</option>
+        <option value="2">Niveau 2</option>
+        <option value="3">Niveau 3</option>
+        <option value="4">Niveau 4</option>
+        <option value="admin">Admin</option>
+    </select>
+
+    <div class="form-actions">
+        <button id="save-case-btn">Enregistrer l'affaire</button>
+        <button id="cancel-create-btn" type="button">Annuler</button>
+    </div>
+</div>
+
+<script>
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const cases = JSON.parse(localStorage.getItem('affaires')) || [];
+
+    // Vérification du niveau d'accréditation
+    function canAccessCase(caseAccreditation) {
+        if (loggedInUser.accreditation === 'admin') return true;
+        return parseInt(loggedInUser.accreditation) >= parseInt(caseAccreditation);
+    }
+
+    // Afficher les affaires en cours
+    function displayCases() {
+        const affairesList = document.getElementById('affaires-list');
+        affairesList.innerHTML = '';
+
+        cases.forEach((affaire, index) => {
+            if (canAccessCase(affaire.accreditation)) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><a href="affaire-detail.html?id=${index}">${affaire.name}</a></td>
+                    <td>${affaire.accreditation}</td>
+                    <td>${affaire.creator}</td>
+                    <td>${new Date(affaire.creationDate).toLocaleString()}</td>
+                    <td>
+                        ${loggedInUser.accreditation === 'admin' ? `<button class="delete-button" onclick="deleteCase(${index})">Supprimer</button>` : ''}
+                    </td>
+                `;
+                affairesList.appendChild(tr);
+            }
+        });
+    }
+
+    // Créer une nouvelle affaire
+    document.getElementById('create-case-btn').addEventListener('click', function() {
+        document.getElementById('create-case-form').style.display = 'block';
+    });
+
+    document.getElementById('cancel-create-btn').addEventListener('click', function() {
+        document.getElementById('create-case-form').style.display = 'none';
+    });
+
+    document.getElementById('save-case-btn').addEventListener('click', function() {
+        const caseName = document.getElementById('case-name').value;
+        const caseAccreditation = document.getElementById('case-accreditation').value;
+
+        if (caseName && caseAccreditation) {
+            const newCase = {
+                name: caseName,
+                accreditation: caseAccreditation,
+                creator: loggedInUser.username,
+                creationDate: new Date().toISOString()
+            };
+
+            if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
+                alert("Seuls les administrateurs peuvent créer des affaires de niveau Admin.");
+                return;
+            }
+
+            cases.push(newCase);
+            localStorage.setItem('affaires', JSON.stringify(cases));
+
+            document.getElementById('create-case-form').style.display = 'none';
+            displayCases();
+        }
+    });
+
+    // Supprimer une affaire (admin seulement)
+    function deleteCase(index) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cette affaire ?")) {
+            cases.splice(index, 1);
+            localStorage.setItem('affaires', JSON.stringify(cases));
+            displayCases();
+        }
+    }
+
+    // Charger les affaires à l'initialisation
+    displayCases();
+</script>
+
+</body>
+</html>
