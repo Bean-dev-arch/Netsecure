@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boîte de réception</title>
+</head>
+<body>
+
+<h1>Boîte de réception</h1>
+
+<!-- Liste des messages reçus -->
+<ul id="message-list"></ul>
+
+<script>
+    // Simuler une boîte de réception avec localStorage (pour chaque utilisateur)
+    const currentUser = 'user1';  // Remplacer par l'utilisateur connecté
+    const messages = JSON.parse(localStorage.getItem(currentUser + '_inbox')) || [];
+
+    // Afficher les messages reçus dans une liste
+    const messageList = document.getElementById('message-list');
+    messages.forEach(message => {
+        const li = document.createElement('li');
+        li.textContent = `Objet: ${message.subject} - Corps: ${message.body}`;
+        messageList.appendChild(li);
+    });
+</script>
+
+</body>
+</html>
