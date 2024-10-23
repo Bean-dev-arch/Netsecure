@@ -37,6 +37,12 @@
         button:hover {
             background-color: #218838;
         }
+        .back-button {
+            background-color: #007bff;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -52,6 +58,10 @@
             <!-- Les utilisateurs seront remplis dynamiquement par JavaScript -->
         </select>
 
+        <!-- Sélection de l'envoyeur -->
+        <label for="sender-name">Nom de l'envoyeur :</label>
+        <input type="text" id="sender-name" placeholder="Nom de l'envoyeur" required>
+
         <!-- Zone de texte pour l'objet -->
         <label for="subject">Objet :</label>
         <input type="text" id="subject" placeholder="Entrer l'objet" required>
@@ -60,9 +70,19 @@
         <label for="message-body">Corps :</label>
         <textarea id="message-body" placeholder="Écrire le corps du message" required></textarea>
 
+        <!-- Sélection de la date et de l'heure de l'envoi -->
+        <label for="send-date">Date d'envoi :</label>
+        <input type="date" id="send-date" required>
+
+        <label for="send-time">Heure d'envoi :</label>
+        <input type="time" id="send-time" required>
+
         <!-- Bouton pour envoyer le rapport -->
         <button type="button" onclick="sendReport()">Envoyer en image</button>
     </form>
+
+    <!-- Bouton pour retourner à la page d'accueil -->
+    <button class="back-button" onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
 
     <!-- Zone pour afficher la confirmation d'envoi -->
     <p id="confirmation-message" style="color:green; display:none;">Message envoyé avec succès !</p>
@@ -90,13 +110,18 @@
     // Fonction pour envoyer le rapport
     function sendReport() {
         const user = document.getElementById('user-select').value;
+        const sender = document.getElementById('sender-name').value;
         const subject = document.getElementById('subject').value;
         const body = document.getElementById('message-body').value;
+        const sendDate = document.getElementById('send-date').value;
+        const sendTime = document.getElementById('send-time').value;
 
-        // Créer un message
+        // Créer un message avec la date et l'heure d'envoi
         const message = {
+            sender: sender,
             subject: subject,
-            body: body
+            body: body,
+            timestamp: sendDate + ' ' + sendTime
         };
 
         // Stocker le message dans la boîte de réception de l'utilisateur
@@ -113,6 +138,9 @@
         }, 2000);
     }
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
