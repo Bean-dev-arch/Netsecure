@@ -60,11 +60,21 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        #search-bar {
+            width: 80%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
     </style>
 </head>
 <body>
 
 <h1>Affaires en cours</h1>
+
+<!-- Barre de recherche -->
+<input type="text" id="search-bar" placeholder="Rechercher une affaire par nom, créateur ou détails...">
 
 <!-- Tableau des affaires en cours -->
 <table id="affaires-table">
@@ -118,12 +128,21 @@
         return parseInt(loggedInUser.accreditation) >= parseInt(caseAccreditation);
     }
 
+    // Filtrer les affaires en fonction de la barre de recherche
+    function filterCases(keyword) {
+        const filteredCases = cases.filter(affaire => {
+            const searchTarget = `${affaire.name} ${affaire.creator} ${affaire.details}`.toLowerCase();
+            return searchTarget.includes(keyword.toLowerCase());
+        });
+        return filteredCases;
+    }
+
     // Afficher les affaires en cours
-    function displayCases() {
+    function displayCases(filteredCases = cases) {
         const affairesList = document.getElementById('affaires-list');
         affairesList.innerHTML = '';
 
-        cases.forEach((affaire, index) => {
+        filteredCases.forEach((affaire, index) => {
             if (canAccessCase(affaire.accreditation)) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -220,7 +239,7 @@
         document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes);
     }
 
-    // Rendre les notes visibles
+     // Rendre les notes visibles
     function renderNotes(notes) {
         if (notes.length === 0) {
             return "<p>Aucune note ajoutée pour l'instant.</p>";
@@ -242,6 +261,13 @@
             displayCases();
         }
     }
+
+    // Fonction de recherche pour filtrer les affaires
+    document.getElementById('search-bar').addEventListener('input', function() {
+        const keyword = this.value.trim();
+        const filteredCases = filterCases(keyword);
+        displayCases(filteredCases);
+    });
 
     // Charger les affaires à l'initialisation
     displayCases();
