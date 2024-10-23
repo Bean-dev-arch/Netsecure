@@ -4,24 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page d'accueil</title>
-    <script defer>
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = JSON.parse(localStorage.getItem('loggedInUser'));
-
-            if (user && user.accreditation === 'admin') {
-                document.getElementById('config-link').style.display = 'block'; // Afficher le lien configuration pour admin
-            }
-        });
-    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 400px;
+        }
+        a, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            font-size: 16px;
+            border-radius: 4px;
+            display: block;
+        }
+        a:hover, button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Bienvenue sur la page d'accueil</h1>
-<ul>
-    <li><a href="inbox.html">Accéder à ma boîte de réception</a></li>
-    <li><a href="reports.html">Envoyer un rapport</a></li>
-    <li id="config-link" style="display:none;"><a href="config.html">Configuration (admin seulement)</a></li>
-</ul>
+<div class="container">
+    <h1>Bienvenue agent </user-name></h1>
+
+    <!-- Lien vers la boîte de réception -->
+    <a href="inbox.html">Accéder à ma boîte de réception</a>
+
+    <!-- Lien vers la page de rapports -->
+    <a href="rapport.html">Envoyer un rapport</a>
+
+    <!-- Si l'utilisateur est admin, afficher le lien vers la configuration -->
+    <button id="config-link" style="display:none;" onclick="window.location.href='config.html'">Configuration (admin seulement)</button>
+</div>
+
+<script>
+    // Vérifier si l'utilisateur connecté est un administrateur
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (loggedInUser && loggedInUser.accreditation === 'admin') {
+        document.getElementById('config-link').style.display = 'block';
+    }
+</script>
 
 </body>
 </html>
