@@ -13,11 +13,17 @@
 <ul id="message-list"></ul>
 
 <script>
-    // Simuler une boîte de réception avec localStorage (pour chaque utilisateur)
-    const currentUser = 'user1';  // Remplacer par l'utilisateur connecté
+    // Fonction pour obtenir le paramètre "user" de l'URL
+    function getQueryParam(param) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(param);
+    }
+
+    // Récupère l'utilisateur depuis l'URL
+    const currentUser = getQueryParam('user');
     const messages = JSON.parse(localStorage.getItem(currentUser + '_inbox')) || [];
 
-    // Afficher les messages reçus dans une liste
+    // Affiche les messages reçus dans une liste
     const messageList = document.getElementById('message-list');
     messages.forEach(message => {
         const li = document.createElement('li');
