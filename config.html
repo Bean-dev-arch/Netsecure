@@ -7,21 +7,67 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Pour commencer le contenu à partir du haut */
-            height: 100vh;
+            background-color: #000; /* Fond noir */
+            color: #ffffff;
             margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
+
+        /* Menu déroulant en haut à droite */
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #000;
+            padding: 10px;
+            border-radius: 4px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #000;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #575757;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         .config-container {
-            background-color: white;
+            background-color: #333;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             width: 600px;
-            margin-top: 100px; /* Décale le contenu plus bas */
+            margin-top: 50px;
+            color: #ffffff;
         }
+
         input, button, select {
             width: 100%;
             padding: 10px;
@@ -29,25 +75,31 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
         button {
             background-color: #28a745;
             color: white;
             font-size: 16px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         table {
             width: 100%;
             margin-top: 20px;
             border-collapse: collapse;
         }
+
         th, td {
             padding: 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
+            color: #ffffff;
         }
+
         .delete-button {
             color: white;
             background-color: red;
@@ -56,6 +108,7 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         .edit-button {
             color: white;
             background-color: blue;
@@ -68,9 +121,22 @@
 </head>
 <body>
 
+<!-- Menu déroulant en haut à droite -->
+<div class="dropdown">
+    Menu
+    <div class="dropdown-content">
+        <a href="homepage.html">Retour à la homepage</a>
+        <a href="rapport.html">Envoyer un rapport</a>
+        <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
+        <a href="most-wanted.html">Most Wanted</a>
+        <button onclick="logout()">Déconnexion</button>
+    </div>
+</div>
+
+<!-- Contenu centré pour la configuration des utilisateurs -->
 <div class="config-container">
     <h2>Configuration des utilisateurs (admin seulement)</h2>
-    
+
     <!-- Formulaire pour ajouter ou modifier un utilisateur -->
     <form id="user-form">
         <input type="hidden" id="editingUserIndex" value="-1">
@@ -89,9 +155,6 @@
 
         <button type="submit">Enregistrer l'utilisateur</button>
     </form>
-
-    <!-- Bouton pour retourner à la page d'accueil -->
-    <button onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
 
     <!-- Liste des utilisateurs -->
     <h3>Liste des utilisateurs</h3>
@@ -189,6 +252,12 @@
         // Charger la liste des utilisateurs au démarrage
         loadUsers();
     });
+
+    // Fonction de déconnexion
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html'; // Rediriger vers la page de connexion
+    }
 </script>
 
 </body>
