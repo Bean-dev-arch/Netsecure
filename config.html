@@ -3,192 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Configuration</title>
+    <title>Configuration des utilisateurs</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Pour commencer le contenu à partir du haut */
-            height: 100vh;
-            margin: 0;
-        }
-        .config-container {
-            background-color: white;
             padding: 20px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            width: 600px;
-            margin-top: 100px; /* Décale le contenu plus bas */
         }
-        input, button, select {
+        table {
             width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
             padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        button, input, select {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
             border-radius: 4px;
+            border: 1px solid #ccc;
         }
         button {
             background-color: #28a745;
             color: white;
-            font-size: 16px;
-            cursor: pointer;
         }
         button:hover {
             background-color: #218838;
         }
-        table {
-            width: 100%;
-            margin-top: 20px;
-            border-collapse: collapse;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-            border-bottom: 1px solid #ddd;
-        }
         .delete-button {
-            color: white;
             background-color: red;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .edit-button {
             color: white;
-            background-color: blue;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
+        }
+        .delete-button:hover {
+            background-color: darkred;
+        }
+        .form-container {
+            margin-bottom: 20px;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
 
-<div class="config-container">
-    <h2>Configuration des utilisateurs (admin seulement)</h2>
-    
-    <!-- Formulaire pour ajouter ou modifier un utilisateur -->
-    <form id="user-form">
-        <input type="hidden" id="editingUserIndex" value="-1">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" id="username" required>
+<h1>Gestion des utilisateurs</h1>
 
-        <label for="password">Mot de passe :</label>
-        <input type="password" id="password" required>
-
-        <h3>Niveau d'accréditation :</h3>
-        <label><input type="radio" name="accreditation" value="1" required> Niveau 1</label>
-        <label><input type="radio" name="accreditation" value="2"> Niveau 2</label>
-        <label><input type="radio" name="accreditation" value="3"> Niveau 3</label>
-        <label><input type="radio" name="accreditation" value="4"> Niveau 4</label>
-        <label><input type="radio" name="accreditation" value="admin"> Admin</label>
-
-        <button type="submit">Enregistrer l'utilisateur</button>
-    </form>
-
-    <!-- Bouton pour retourner à la page d'accueil -->
-    <button onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
-
-    <!-- Liste des utilisateurs -->
-    <h3>Liste des utilisateurs</h3>
-    <table>
-        <thead>
-            <tr>
-                <th>Nom d'utilisateur</th>
-                <th>Mot de passe</th>
-                <th>Accréditation</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody id="user-list">
-            <!-- Liste dynamique des utilisateurs -->
-        </tbody>
-    </table>
+<!-- Formulaire pour ajouter un nouvel utilisateur -->
+<div class="form-container">
+    <h3>Ajouter un utilisateur</h3>
+    <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+    <input type="password" id="password" placeholder="Mot de passe" required>
+    <label for="accreditation">Niveau d'accréditation :</label>
+    <select id="accreditation">
+        <option value="1">Niveau 1</option>
+        <option value="2">Niveau 2</option>
+        <option value="3">Niveau 3</option>
+        <option value="4">Niveau 4</option>
+        <option value="admin">Admin</option>
+    </select>
+    <button onclick="addUser()">Ajouter</button>
 </div>
 
+<!-- Tableau des utilisateurs existants -->
+<table>
+    <thead>
+        <tr>
+            <th>Nom d'utilisateur</th>
+            <th>Mot de passe</th>
+            <th>Niveau d'accréditation</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="user-list">
+        <!-- Les utilisateurs seront affichés ici -->
+    </tbody>
+</table>
+
+<!-- Bouton pour revenir à la page d'accueil -->
+<button class="back-button" onclick="window.location.href='homepage.html'">Retour à la homepage</button>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-        if (!user || user.accreditation !== 'admin') {
-            alert("Accès refusé. Vous n'êtes pas administrateur.");
-            window.location.href = 'homepage.html'; // Redirection si non admin
-        }
+    // Afficher les utilisateurs existants
+    function displayUsers() {
+        const userList = document.getElementById('user-list');
+        userList.innerHTML = '';
 
-        // Charger la liste des utilisateurs à partir du localStorage
-        function loadUsers() {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const userList = document.getElementById('user-list');
-            userList.innerHTML = '';
-
-            users.forEach((user, index) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = 
-                    <td>${user.username}</td>
-                    <td>${user.password}</td>
-                    <td>${user.accreditation}</td>
-                    <td>
-                        <button class="edit-button" onclick="editUser(${index})">Modifier</button>
-                        <button class="delete-button" onclick="deleteUser(${index})">❌</button>
-                    </td>
-                ;
-                userList.appendChild(tr);
-            });
-        }
-
-        // Ajouter ou modifier un utilisateur
-        document.getElementById('user-form').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-            const accreditation = document.querySelector('input[name="accreditation"]:checked').value;
-
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const editingIndex = document.getElementById('editingUserIndex').value;
-
-            if (editingIndex == -1) {
-                // Ajouter un nouvel utilisateur
-                users.push({ username, password, accreditation });
-            } else {
-                // Modifier l'utilisateur existant
-                users[editingIndex] = { username, password, accreditation };
-            }
-
-            localStorage.setItem('users', JSON.stringify(users));
-            loadUsers();
-
-            // Réinitialiser le formulaire
-            document.getElementById('user-form').reset();
-            document.getElementById('editingUserIndex').value = -1;
+        users.forEach((user, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.username}</td>
+                <td>${user.password}</td>
+                <td>${user.accreditation}</td>
+                <td>
+                    <button onclick="editUser(${index})">Modifier</button>
+                    <button class="delete-button" onclick="deleteUser(${index})">Supprimer</button>
+                </td>
+            `;
+            userList.appendChild(tr);
         });
+    }
 
-        // Fonction pour supprimer un utilisateur
-        window.deleteUser = function(index) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            users.splice(index, 1); // Supprimer l'utilisateur de la liste
+    // Ajouter un utilisateur
+    function addUser() {
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const accreditation = document.getElementById('accreditation').value;
+
+        if (username && password) {
+            const newUser = { username, password, accreditation };
+            users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
-            loadUsers(); // Recharger la liste des utilisateurs
-        };
+            displayUsers();
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        } else {
+            alert('Veuillez remplir tous les champs.');
+        }
+    }
 
-        // Fonction pour modifier un utilisateur
-        window.editUser = function(index) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const user = users[index];
+    // Modifier un utilisateur
+    function editUser(index) {
+        const user = users[index];
+        const newUsername = prompt("Modifier le nom d'utilisateur :", user.username);
+        const newPassword = prompt("Modifier le mot de passe :", user.password);
+        const newAccreditation = prompt("Modifier le niveau d'accréditation :", user.accreditation);
 
-            document.getElementById('username').value = user.username;
-            document.getElementById('password').value = user.password;
-            document.querySelector(input[name="accreditation"][value="${user.accreditation}"]).checked = true;
-            document.getElementById('editingUserIndex').value = index;
-        };
+        if (newUsername && newPassword && newAccreditation) {
+            users[index] = { username: newUsername, password: newPassword, accreditation: newAccreditation };
+            localStorage.setItem('users', JSON.stringify(users));
+            displayUsers();
+        } else {
+            alert("Tous les champs doivent être remplis.");
+        }
+    }
 
-        // Charger la liste des utilisateurs au démarrage
-        loadUsers();
-    });
+    // Supprimer un utilisateur
+    function deleteUser(index) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+            users.splice(index, 1);
+            localStorage.setItem('users', JSON.stringify(users));
+            displayUsers();
+        }
+    }
+
+    // Charger les utilisateurs au démarrage
+    displayUsers();
 </script>
 
 </body>
