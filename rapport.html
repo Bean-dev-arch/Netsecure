@@ -4,47 +4,88 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Envoyer un rapport</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 400px;
+        }
+        input, select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Envoyer un rapport</h1>
+<div class="container">
+    <h1>Envoyer un rapport</h1>
 
-<!-- Formulaire pour envoyer un rapport -->
-<form id="report-form">
-    <!-- Sélection de l'utilisateur -->
-    <label for="user-select">Sélectionner un utilisateur :</label>
-    <select id="user-select" required>
-        <!-- Les utilisateurs seront remplis dynamiquement par JavaScript -->
-    </select>
+    <!-- Formulaire pour envoyer un rapport -->
+    <form id="report-form">
+        <!-- Sélection de l'utilisateur -->
+        <label for="user-select">Sélectionner un utilisateur :</label>
+        <select id="user-select" required>
+            <!-- Les utilisateurs seront remplis dynamiquement par JavaScript -->
+        </select>
 
-    <!-- Zone de texte pour l'objet -->
-    <label for="subject">Objet :</label>
-    <input type="text" id="subject" placeholder="Entrer l'objet" required>
+        <!-- Zone de texte pour l'objet -->
+        <label for="subject">Objet :</label>
+        <input type="text" id="subject" placeholder="Entrer l'objet" required>
 
-    <!-- Zone de texte pour le corps du message -->
-    <label for="message-body">Corps :</label>
-    <textarea id="message-body" placeholder="Écrire le corps du message" required></textarea>
+        <!-- Zone de texte pour le corps du message -->
+        <label for="message-body">Corps :</label>
+        <textarea id="message-body" placeholder="Écrire le corps du message" required></textarea>
 
-    <!-- Bouton pour envoyer le rapport -->
-    <button type="button" onclick="sendReport()">Envoyer en image</button>
-</form>
+        <!-- Bouton pour envoyer le rapport -->
+        <button type="button" onclick="sendReport()">Envoyer en image</button>
+    </form>
 
-<!-- Zone pour afficher la confirmation d'envoi -->
-<p id="confirmation-message" style="color:green; display:none;">Message envoyé avec succès !</p>
+    <!-- Zone pour afficher la confirmation d'envoi -->
+    <p id="confirmation-message" style="color:green; display:none;">Message envoyé avec succès !</p>
+</div>
 
 <!-- Script pour gérer l'envoi des rapports -->
 <script>
     // Charger les utilisateurs depuis le localStorage
     const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Remplir dynamiquement le menu déroulant avec les utilisateurs enregistrés
-    const userSelect = document.getElementById('user-select');
-    users.forEach(user => {
-        const option = document.createElement('option');
-        option.value = user.username;  // Utiliser l'identifiant pour l'envoi
-        option.textContent = user.username;  // Afficher le nom de l'utilisateur dans le menu déroulant
-        userSelect.appendChild(option);
-    });
+    // Vérifier s'il y a des utilisateurs enregistrés
+    if (users.length === 0) {
+        alert('Aucun utilisateur enregistré. Veuillez d\'abord ajouter des utilisateurs dans la page de configuration.');
+    } else {
+        // Remplir dynamiquement le menu déroulant avec les utilisateurs enregistrés
+        const userSelect = document.getElementById('user-select');
+        users.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.username;  // Utiliser l'identifiant pour l'envoi
+            option.textContent = user.username;  // Afficher le nom de l'utilisateur dans le menu déroulant
+            userSelect.appendChild(option);
+        });
+    }
 
     // Fonction pour envoyer le rapport
     function sendReport() {
@@ -75,4 +116,5 @@
 
 </body>
 </html>
+
 
