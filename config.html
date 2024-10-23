@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuration</title>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+
+            if (!user || user.accreditation !== 'admin') {
+                alert("Accès refusé. Vous n'êtes pas administrateur.");
+                window.location.href = 'homepage.html'; // Redirection si non admin
+            }
+
+            document.getElementById('user-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const accreditation = document.querySelector('input[name="accreditation"]:checked').value;
+
+                // Récupérer les utilisateurs existants ou initialiser un tableau vide
+                const users = JSON.parse(localStorage.getItem('users')) || [];
+
+                // Ajouter le nouvel utilisateur
+                users.push({ username: username, password: password, accreditation: accreditation });
+                localStorage.setItem('users', JSON.stringify(users));
+
+                // Afficher un message de confirmation
+                alert(`Utilisateur ${username} ajouté avec un niveau ${accreditation}`);
+                document.getElementById('user-form').reset(); // Réinitialiser le formulaire
+            });
+        });
+    </script>
+</head>
+<body>
+
+<h1>Configuration des utilisateurs (admin seulement)</h1>
+<form id="user-form">
+    <label for="username">Nom d'utilisateur :</label>
+    <input type="text" id="username" required>
+
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" required>
+
+    <h3>Niveau d'accréditation :</h3>
+    <label><input type="radio" name="accreditation" value="1" required> Niveau 1</label>
+    <label><input type="radio" name="accreditation" value="2"> Niveau 2</label>
+    <label><input type="radio" name="accreditation" value="3"> Niveau 3</label>
+    <label><input type="radio" name="accreditation" value="4"> Niveau 4</label>
+    <label><input type="radio" name="accreditation" value="admin"> Admin</label>
+
+    <button type="submit">Ajouter l'utilisateur</button>
+</form>
+
+</body>
+</html>
 
