@@ -1,0 +1,4 @@
+[
+  { "username": "MonIdentifiant", "password": "adminPassword", "accreditation": "admin" },
+  { "username": "stone", "password": "1234", "accreditation": "admin" }
+]
