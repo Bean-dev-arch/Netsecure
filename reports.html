@@ -14,9 +14,7 @@
     <!-- Sélection de l'utilisateur -->
     <label for="user-select">Sélectionner un utilisateur :</label>
     <select id="user-select" required>
-        <option value="user1">Utilisateur 1</option>
-        <option value="user2">Utilisateur 2</option>
-        <option value="user3">Utilisateur 3</option>
+        <!-- Les utilisateurs sont remplis dynamiquement par JavaScript -->
     </select>
 
     <!-- Zone de texte pour l'objet -->
@@ -36,8 +34,20 @@
 
 <!-- Script pour gérer l'envoi des rapports -->
 <script>
+    // Liste des utilisateurs connus (tu peux remplacer ces valeurs par les identifiants réels)
+    const knownUsers = ['user1', 'user2', 'user3'];  // Remplace ces utilisateurs par les identifiants connus
+
+    // Remplir dynamiquement le menu déroulant avec les utilisateurs connus
+    const userSelect = document.getElementById('user-select');
+    knownUsers.forEach(user => {
+        const option = document.createElement('option');
+        option.value = user;
+        option.textContent = user;  // Affiche l'identifiant dans le menu déroulant
+        userSelect.appendChild(option);
+    });
+
+    // Fonction pour envoyer le rapport
     function sendReport() {
-        // Récupérer les informations du formulaire
         const user = document.getElementById('user-select').value;
         const subject = document.getElementById('subject').value;
         const body = document.getElementById('message-body').value;
@@ -56,11 +66,16 @@
         // Afficher la confirmation d'envoi
         document.getElementById('confirmation-message').style.display = 'block';
 
-        // Attendre 2 secondes, puis rediriger vers la page d'accueil
+        // Rediriger vers la page d'accueil après 2 secondes
         setTimeout(function() {
             window.location.href = 'homepage.html';
-        }, 2000);  // 2000 millisecondes = 2 secondes
+        }, 2000);
     }
+</script>
+
+</body>
+</html>
+
 </script>
 
 </body>
