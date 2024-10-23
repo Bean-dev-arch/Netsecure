@@ -57,6 +57,12 @@
             display: flex;
             justify-content: space-between;
         }
+        .back-button {
+            background-color: #007bff;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +108,9 @@
         <button id="cancel-create-btn" type="button">Annuler</button>
     </div>
 </div>
+
+<!-- Bouton pour retourner à la page d'accueil -->
+<button class="back-button" onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
 
 <script>
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -184,3 +193,4 @@
 
 </body>
 </html>
+
