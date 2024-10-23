@@ -14,7 +14,7 @@
     <!-- Sélection de l'utilisateur -->
     <label for="user-select">Sélectionner un utilisateur :</label>
     <select id="user-select" required>
-        <!-- Les utilisateurs sont remplis dynamiquement par JavaScript -->
+        <!-- Les utilisateurs seront remplis dynamiquement par JavaScript -->
     </select>
 
     <!-- Zone de texte pour l'objet -->
@@ -34,15 +34,15 @@
 
 <!-- Script pour gérer l'envoi des rapports -->
 <script>
-    // Liste des utilisateurs connus (tu peux remplacer ces valeurs par les identifiants réels)
-    const knownUsers = ['user1', 'user2', 'user3'];  // Remplace ces utilisateurs par les identifiants connus
+    // Charger les utilisateurs depuis le localStorage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Remplir dynamiquement le menu déroulant avec les utilisateurs connus
+    // Remplir dynamiquement le menu déroulant avec les utilisateurs enregistrés
     const userSelect = document.getElementById('user-select');
-    knownUsers.forEach(user => {
+    users.forEach(user => {
         const option = document.createElement('option');
-        option.value = user;
-        option.textContent = user;  // Affiche l'identifiant dans le menu déroulant
+        option.value = user.username;  // Utiliser l'identifiant pour l'envoi
+        option.textContent = user.username;  // Afficher le nom de l'utilisateur dans le menu déroulant
         userSelect.appendChild(option);
     });
 
@@ -71,11 +71,6 @@
             window.location.href = 'homepage.html';
         }, 2000);
     }
-</script>
-
-</body>
-</html>
-
 </script>
 
 </body>
