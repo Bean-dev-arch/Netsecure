@@ -7,23 +7,89 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000; /* Fond noir */
+            color: #ffffff;
+            margin: 0;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
-            margin: 0;
-            padding: 20px;
         }
+
+        /* Menu déroulant en haut à droite */
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #000;
+            padding: 10px;
+            border-radius: 4px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #000;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #575757;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        /* Centrage du contenu */
+        .center-content {
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        #search-bar {
+            width: 50%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
         table {
             width: 80%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         th, td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
+            color: #ffffff;
         }
+
         button {
             padding: 10px 20px;
             background-color: #28a745;
@@ -32,9 +98,11 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         .delete-button {
             background-color: red;
             color: white;
@@ -42,17 +110,19 @@
             padding: 5px;
             border-radius: 4px;
         }
+
         .delete-button:hover {
             background-color: darkred;
         }
+
         .note-container {
             display: none;
             margin-top: 10px;
             padding: 10px;
-            background-color: #f9f9f9;
-            border: 1px solid #ddd;
+            background-color: #333;
             border-radius: 4px;
         }
+
         textarea, input {
             width: 100%;
             padding: 10px;
@@ -60,19 +130,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
-        #search-bar {
-            width: 80%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .note-image {
-            max-width: 100px;
-            margin-top: 10px;
-            cursor: pointer;
-        }
-        /* Styles pour la modale d'affichage en plein écran */
+
         .modal {
             display: none;
             position: fixed;
@@ -85,10 +143,12 @@
             justify-content: center;
             align-items: center;
         }
+
         .modal img {
             max-width: 90%;
             max-height: 90%;
         }
+
         .close-modal {
             position: absolute;
             top: 10px;
@@ -103,31 +163,44 @@
 </head>
 <body>
 
-<h1>Affaires en cours</h1>
+<!-- Menu déroulant en haut à droite -->
+<div class="dropdown">
+    Menu
+    <div class="dropdown-content">
+        <a href="homepage.html">Retour à la homepage</a>
+        <a href="rapport.html">Envoyer un rapport</a>
+        <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
+        <a href="most-wanted.html">Most Wanted</a>
+        <button onclick="logout()">Déconnexion</button>
+    </div>
+</div>
 
-    <button onclick="window.location.href='homepage.html'">Retour à la homepage</button>
+<!-- Contenu centralisé -->
+<div class="center-content">
+    <h1>Affaires en cours</h1>
 
-<!-- Barre de recherche -->
-<input type="text" id="search-bar" placeholder="Rechercher une affaire par nom, créateur ou détails...">
+    <!-- Barre de recherche -->
+    <input type="text" id="search-bar" placeholder="Rechercher une affaire par nom, créateur ou détails...">
 
-<!-- Tableau des affaires en cours -->
-<table id="affaires-table">
-    <thead>
-        <tr>
-            <th>Nom de l'affaire</th>
-            <th>Niveau d'accréditation requis</th>
-            <th>Créateur</th>
-            <th>Date de création</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody id="affaires-list">
-        <!-- Les affaires seront affichées ici -->
-    </tbody>
-</table>
+    <!-- Tableau des affaires en cours -->
+    <table id="affaires-table">
+        <thead>
+            <tr>
+                <th>Nom de l'affaire</th>
+                <th>Niveau d'accréditation requis</th>
+                <th>Créateur</th>
+                <th>Date de création</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="affaires-list">
+            <!-- Les affaires seront affichées ici -->
+        </tbody>
+    </table>
 
-<!-- Bouton pour créer une nouvelle affaire -->
-<button id="create-case-btn">Créer une nouvelle affaire</button>
+    <!-- Bouton pour créer une nouvelle affaire -->
+    <button id="create-case-btn">Créer une nouvelle affaire</button>
+</div>
 
 <!-- Formulaire pour créer une affaire -->
 <div class="create-case-form" id="create-case-form" style="display:none;">
@@ -144,7 +217,6 @@
         <option value="admin">Admin</option>
     </select>
 
-    <!-- Champ pour ajouter des détails -->
     <label for="case-details">Détails de l'affaire :</label>
     <textarea id="case-details" placeholder="Ajouter des détails..." required></textarea>
 
@@ -162,13 +234,11 @@
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     const cases = JSON.parse(localStorage.getItem('affaires')) || [];
 
-    // Vérification du niveau d'accréditation
     function canAccessCase(caseAccreditation) {
         if (loggedInUser.accreditation === 'admin') return true;
         return parseInt(loggedInUser.accreditation) >= parseInt(caseAccreditation);
     }
 
-    // Filtrer les affaires en fonction de la barre de recherche
     function filterCases(keyword) {
         const filteredCases = cases.filter(affaire => {
             const searchTarget = `${affaire.name} ${affaire.creator} ${affaire.details}`.toLowerCase();
@@ -177,7 +247,6 @@
         return filteredCases;
     }
 
-    // Afficher les affaires en cours
     function displayCases(filteredCases = cases) {
         const affairesList = document.getElementById('affaires-list');
         affairesList.innerHTML = '';
@@ -206,6 +275,8 @@
                     <h4>Notes :</h4>
                     <div id="notes-list-${index}">${renderNotes(affaire.notes || [], index)}</div>
                     <textarea id="new-note-${index}" placeholder="Ajouter une note..." required></textarea>
+                    <input type="file" id="note-image
+
                     <input type="file" id="note-image-${index}" accept="image/*">
                     <button onclick="addNote(${index})">Ajouter la note</button>
                 `;
@@ -244,7 +315,7 @@
                 notes: []
             };
 
-                       if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
+            if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
                 alert("Seuls les administrateurs peuvent créer des affaires de niveau Admin.");
                 return;
             }
@@ -344,6 +415,12 @@
 
     // Charger les affaires à l'initialisation
     displayCases();
+
+    // Fonction de déconnexion
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html'; // Rediriger vers la page de connexion
+    }
 </script>
 
 </body>
