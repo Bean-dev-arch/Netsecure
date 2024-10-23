@@ -7,41 +7,56 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000; /* Fond noir */
+            color: #ffffff;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
             margin: 0;
         }
+
         .container {
-            background-color: white;
+            background-color: #333;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             width: 400px;
+            color: #ffffff;
         }
+
         input, select, textarea, button {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
+            color: #000;
         }
+
         button {
             background-color: #28a745;
             color: white;
             font-size: 16px;
             cursor: pointer;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         .back-button {
             background-color: #007bff;
+            margin-top: 10px;
         }
+
         .back-button:hover {
             background-color: #0056b3;
+        }
+
+        #confirmation-message {
+            color: #28a745;
+            display: none;
         }
     </style>
 </head>
@@ -85,7 +100,7 @@
     <button class="back-button" onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
 
     <!-- Zone pour afficher la confirmation d'envoi -->
-    <p id="confirmation-message" style="color:green; display:none;">Message envoyé avec succès !</p>
+    <p id="confirmation-message">Message envoyé avec succès !</p>
 </div>
 
 <!-- Script pour gérer l'envoi des rapports -->
@@ -141,8 +156,3 @@
 
 </body>
 </html>
-
-</body>
-</html>
-
-
