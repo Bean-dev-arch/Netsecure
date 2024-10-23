@@ -1,61 +1,71 @@
 const fs = require('fs');
 const path = require('path');
 
-// Chemin vers le fichier JSON des utilisateurs
-const usersFilePath = path.resolve(__dirname, '../../data/users.json');
+// Définition du chemin vers le fichier JSON des utilisateurs, à partir du dossier des fonctions Netlify
+const usersFilePath = path.resolve(__dirname, 'users.json'); // Chemin vers users.json dans le dossier /netlify/functions
 
-// Fonction pour gérer les utilisateurs (GET pour lire, POST pour ajouter des utilisateurs)
 exports.handler = async (event) => {
-  const method = event.httpMethod;
+    const method = event.httpMethod;
 
-  if (method === 'GET') {
-    // Lire le fichier users.json
-    const usersData = fs.readFileSync(usersFilePath);
-    return {
-      statusCode: 200,
-      body: usersData,
-    };
-  }
-
-  if (method === 'POST') {
-    // Ajouter un nouvel utilisateur
-    const { username, password, accreditation } = JSON.parse(event.body);
-
-    if (!username || !password || !accreditation) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Tous les champs sont requis.' }),
-      };
+    if (method === 'GET') {
+        try {
+            // Lire le fichier users.json pour récupérer la liste des utilisateurs
+            const usersData = fs.readFileSync(usersFilePath, 'utf-8');
+            return {
+                statusCode: 200,
+                body: usersData, // Retourner les utilisateurs en JSON
+            };
+        } catch (error) {
+            // Gérer les erreurs lors de la lecture du fichier
+            console.error('Erreur lors de la lecture du fichier users.json:', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: 'Erreur lors de la lecture des utilisateurs.' }),
+            };
+        }
     }
 
-    // Lire les utilisateurs actuels
-    const usersData = fs.readFileSync(usersFilePath);
-    const users = JSON.parse(usersData);
+    if (method === 'POST') {
+        try {
+            // Récupérer les données du corps de la requête POST
+            const { username, password, accreditation } = JSON.parse(event.body);
 
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = users.find(user => user.username === username);
-    if (existingUser) {
-      return {
-        statusCode: 400,
-        body: JSON.stringify({ message: 'Cet utilisateur existe déjà.' }),
-      };
+            // Vérification que tous les champs sont fournis
+            if (!username || !password || !accreditation) {
+                return {
+                    statusCode: 400,
+                    body: JSON.stringify({ message: 'Tous les champs sont requis.' }),
+                };
+            }
+
+            // Lire les utilisateurs existants
+            const usersData = fs.readFileSync(usersFilePath, 'utf-8');
+            const users = JSON.parse(usersData);
+
+            // Ajouter le nouvel utilisateur
+            users.push({ username, password, accreditation });
+
+            // Écrire les modifications dans users.json
+            fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
+
+            return {
+                statusCode: 201,
+                body: JSON.stringify({ message: `Utilisateur ${username} ajouté avec succès.` }),
+            };
+        } catch (error) {
+            // Gérer les erreurs lors de l'ajout d'un utilisateur
+            console.error('Erreur lors de l\'ajout de l\'utilisateur:', error);
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: 'Erreur interne du serveur.' }),
+            };
+        }
     }
 
-    // Ajouter le nouvel utilisateur
-    const newUser = { username, password, accreditation };
-    users.push(newUser);
-
-    // Écrire le nouveau fichier users.json
-    fs.writeFileSync(usersFilePath, JSON.stringify(users, null, 2));
-
+    // Méthode non autorisée
     return {
-      statusCode: 201,
-      body: JSON.stringify({ message: 'Utilisateur ajouté avec succès.' }),
+        statusCode: 405,
+        body: 'Méthode non autorisée.',
     };
-  }
-
-  return {
-    statusCode: 405,
-    body: 'Méthode non autorisée.',
-  };
 };
+
