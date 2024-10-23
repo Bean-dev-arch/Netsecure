@@ -4,44 +4,213 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Boîte de réception</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        button {
+            padding: 10px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .delete-button {
+            background-color: red;
+        }
+        .delete-button:hover {
+            background-color: darkred;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Boîte de réception</h1>
+<div class="container">
+    <h1>Boîte de réception</h1>
 
-<!-- Liste des messages reçus -->
-<ul id="message-list"></ul>
+    <!-- Bouton pour retourner à la page d'accueil -->
+    <button onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
+
+    <!-- Table pour afficher les messages reçus -->
+    <table id="message-table">
+        <thead>
+            <tr>
+                <th>Date de réception</th>
+                <th>Envoyeur</th>
+                <th>Objet</th>
+                <th>Message</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="message-list">
+            <!-- Les messages reçus seront insérés ici -->
+        </tbody>
+    </table>
+
+    <!-- Formulaire pour créer un dossier -->
+    <h3>Créer un dossier</h3>
+    <input type="text" id="folder-name" placeholder="Nom du dossier">
+    <button onclick="createFolder()">Créer le dossier</button>
+
+    <!-- Liste des dossiers -->
+    <h3>Dossiers</h3>
+    <ul id="folder-list">
+        <!-- Les dossiers seront affichés ici -->
+    </ul>
+</div>
 
 <script>
-    // Fonction pour obtenir le paramètre "user" de l'URL
-    function getQueryParam(param) {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get(param);
+    const currentUser = JSON.parse(localStorage.getItem('loggedInUser')).username;
+    const inboxKey = currentUser + '_inbox';
+    const messages = JSON.parse(localStorage.getItem(inboxKey)) || [];
+    const messageTable = document.getElementById('message-list');
+
+    // Fonction pour afficher les messages reçus
+    function displayMessages() {
+        messageTable.innerHTML = ''; // Vider la table des messages
+        if (messages.length === 0) {
+            messageTable.innerHTML = "<tr><td colspan='5'>Aucun message dans la boîte de réception.</td></tr>";
+        } else {
+            messages.forEach((message, index) => {
+                const tr = document.createElement('tr');
+                const messageDate = new Date(message.timestamp).toLocaleString();
+
+                tr.innerHTML = `
+                    <td>${messageDate}</td>
+                    <td>${message.sender}</td>
+                    <td>${message.subject}</td>
+                    <td>${message.body}</td>
+                    <td>
+                        <button class="delete-button" onclick="deleteMessage(${index})">Supprimer</button>
+                        <button onclick="moveToFolder(${index})">Déplacer vers un dossier</button>
+                    </td>
+                `;
+                messageTable.appendChild(tr);
+            });
+        }
     }
 
-    // Récupère l'utilisateur depuis l'URL
-    const currentUser = getQueryParam('user');
-    
-    // Vérifie si l'utilisateur est bien identifié
-    if (!currentUser) {
-        document.body.innerHTML = "<h1>Erreur : Utilisateur non trouvé</h1>";
-        return;
+    // Fonction pour supprimer un message
+    function deleteMessage(index) {
+        messages.splice(index, 1); // Supprimer le message de la liste
+        localStorage.setItem(inboxKey, JSON.stringify(messages)); // Mettre à jour le localStorage
+        displayMessages(); // Rafraîchir l'affichage
     }
 
-    // Récupère les messages de la boîte de réception de l'utilisateur
-    const messages = JSON.parse(localStorage.getItem(currentUser + '_inbox')) || [];
+    // Fonction pour déplacer un message vers un dossier
+    function moveToFolder(index) {
+        const folderName = prompt("Entrez le nom du dossier vers lequel déplacer le message :");
+        if (!folderName) return;
 
-    // Affiche les messages reçus dans une liste
-    const messageList = document.getElementById('message-list');
-    if (messages.length === 0) {
-        messageList.innerHTML = "<li>Aucun message dans la boîte de réception.</li>";
-    } else {
-        messages.forEach(message => {
+        const folders = JSON.parse(localStorage.getItem(currentUser + '_folders')) || {};
+        if (!folders[folderName]) {
+            alert('Dossier non trouvé.');
+            return;
+        }
+
+        const message = messages.splice(index, 1)[0]; // Retirer le message de la boîte de réception
+        folders[folderName].push(message); // Ajouter le message au dossier
+        localStorage.setItem(inboxKey, JSON.stringify(messages)); // Mettre à jour la boîte de réception
+        localStorage.setItem(currentUser + '_folders', JSON.stringify(folders)); // Mettre à jour les dossiers
+        displayMessages(); // Rafraîchir l'affichage
+    }
+
+    // Fonction pour créer un dossier
+    function createFolder() {
+        const folderName = document.getElementById('folder-name').value;
+        if (!folderName) {
+            alert('Veuillez entrer un nom de dossier.');
+            return;
+        }
+
+        const folders = JSON.parse(localStorage.getItem(currentUser + '_folders')) || {};
+        if (folders[folderName]) {
+            alert('Un dossier avec ce nom existe déjà.');
+        } else {
+            folders[folderName] = [];
+            localStorage.setItem(currentUser + '_folders', JSON.stringify(folders)); // Enregistrer le nouveau dossier
+            alert(`Dossier "${folderName}" créé.`);
+            displayFolders(); // Afficher les dossiers
+        }
+        document.getElementById('folder-name').value = ''; // Réinitialiser le champ
+    }
+
+    // Fonction pour afficher les dossiers existants
+    function displayFolders() {
+        const folderList = document.getElementById('folder-list');
+        folderList.innerHTML = ''; // Vider la liste des dossiers
+        const folders = JSON.parse(localStorage.getItem(currentUser + '_folders')) || {};
+
+        for (const folder in folders) {
             const li = document.createElement('li');
-            li.textContent = `Objet: ${message.subject} - Corps: ${message.body}`;
-            messageList.appendChild(li);
+            li.innerHTML = `<button onclick="openFolder('${folder}')">${folder}</button>`;
+            folderList.appendChild(li);
+        }
+    }
+
+    // Fonction pour ouvrir un dossier et afficher son contenu
+    function openFolder(folderName) {
+        const folders = JSON.parse(localStorage.getItem(currentUser + '_folders')) || {};
+        const folderMessages = folders[folderName] || [];
+        messageTable.innerHTML = ''; // Vider la table des messages
+        folderMessages.forEach((message, index) => {
+            const tr = document.createElement('tr');
+            const messageDate = new Date(message.timestamp).toLocaleString();
+
+            tr.innerHTML = `
+                <td>${messageDate}</td>
+                <td>${message.sender}</td>
+                <td>${message.subject}</td>
+                <td>${message.body}</td>
+                <td>
+                    <button class="delete-button" onclick="deleteFolderMessage('${folderName}', ${index})">Supprimer</button>
+                </td>
+            `;
+            messageTable.appendChild(tr);
         });
     }
+
+    // Fonction pour supprimer un message d'un dossier
+    function deleteFolderMessage(folderName, index) {
+        const folders = JSON.parse(localStorage.getItem(currentUser + '_folders')) || {};
+        folders[folderName].splice(index, 1); // Supprimer le message du dossier
+        localStorage.setItem(currentUser + '_folders', JSON.stringify(folders)); // Mettre à jour le localStorage
+        openFolder(folderName); // Rafraîchir l'affichage du dossier
+    }
+
+    // Charger les messages et les dossiers au démarrage
+    displayMessages();
+    displayFolders();
 </script>
 
 </body>
