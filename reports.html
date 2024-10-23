@@ -14,13 +14,12 @@
     <!-- Sélection de l'utilisateur -->
     <label for="user-select">Sélectionner un utilisateur :</label>
     <select id="user-select" required>
-        <!-- Ces utilisateurs peuvent être remplis dynamiquement par JavaScript -->
         <option value="user1">Utilisateur 1</option>
         <option value="user2">Utilisateur 2</option>
         <option value="user3">Utilisateur 3</option>
     </select>
 
-    <!-- Zone de texte pour le sujet -->
+    <!-- Zone de texte pour l'objet -->
     <label for="subject">Objet :</label>
     <input type="text" id="subject" placeholder="Entrer l'objet" required>
 
@@ -37,39 +36,33 @@
 
 <!-- Script pour gérer l'envoi des rapports -->
 <script>
-  function sendReport() {
-    // Récupérer les informations du formulaire
-    const user = document.getElementById('user-select').value;
-    const subject = document.getElementById('subject').value;
-    const body = document.getElementById('message-body').value;
+    function sendReport() {
+        // Récupérer les informations du formulaire
+        const user = document.getElementById('user-select').value;
+        const subject = document.getElementById('subject').value;
+        const body = document.getElementById('message-body').value;
 
-    // Créer un message
-    const message = {
-        subject: subject,
-        body: body
-    };
+        // Créer un message
+        const message = {
+            subject: subject,
+            body: body
+        };
 
-    // Stocker le message dans la boîte de réception de l'utilisateur
-    const inbox = JSON.parse(localStorage.getItem(user + '_inbox')) || [];
-    inbox.push(message);
-    localStorage.setItem(user + '_inbox', JSON.stringify(inbox));
+        // Stocker le message dans la boîte de réception de l'utilisateur
+        const inbox = JSON.parse(localStorage.getItem(user + '_inbox')) || [];
+        inbox.push(message);
+        localStorage.setItem(user + '_inbox', JSON.stringify(inbox));
 
-    // Afficher la confirmation d'envoi
-    document.getElementById('confirmation-message').style.display = 'block';
-
-    // Réinitialiser le formulaire
-    document.getElementById('report-form').reset();
-}
-
-        // Créer une image à partir du message (ici un simple alert pour la démo)
-        alert(`Message envoyé à ${user}\nObjet: ${subject}\nCorps: ${body}`);
-
-        // Simuler l'envoi et la réception
+        // Afficher la confirmation d'envoi
         document.getElementById('confirmation-message').style.display = 'block';
 
-        // Ajouter la logique pour envoyer l'image au serveur (si besoin)
+        // Attendre 2 secondes, puis rediriger vers la page d'accueil
+        setTimeout(function() {
+            window.location.href = 'homepage.html';
+        }, 2000);  // 2000 millisecondes = 2 secondes
     }
 </script>
 
 </body>
 </html>
+
