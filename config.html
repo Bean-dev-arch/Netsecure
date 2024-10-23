@@ -4,56 +4,193 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Configuration</title>
-    <script defer>
-        document.addEventListener('DOMContentLoaded', function () {
-            const user = JSON.parse(localStorage.getItem('loggedInUser'));
-
-            if (!user || user.accreditation !== 'admin') {
-                alert("Accès refusé. Vous n'êtes pas administrateur.");
-                window.location.href = 'homepage.html'; // Redirection si non admin
-            }
-
-            document.getElementById('user-form').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const accreditation = document.querySelector('input[name="accreditation"]:checked').value;
-
-                // Récupérer les utilisateurs existants ou initialiser un tableau vide
-                const users = JSON.parse(localStorage.getItem('users')) || [];
-
-                // Ajouter le nouvel utilisateur
-                users.push({ username: username, password: password, accreditation: accreditation });
-                localStorage.setItem('users', JSON.stringify(users));
-
-                // Afficher un message de confirmation
-                alert(`Utilisateur ${username} ajouté avec un niveau ${accreditation}`);
-                document.getElementById('user-form').reset(); // Réinitialiser le formulaire
-            });
-        });
-    </script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .config-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 600px;
+        }
+        input, button, select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .delete-button {
+            color: white;
+            background-color: red;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-button {
+            color: white;
+            background-color: blue;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
-<h1>Configuration des utilisateurs (admin seulement)</h1>
-<form id="user-form">
-    <label for="username">Nom d'utilisateur :</label>
-    <input type="text" id="username" required>
+<div class="config-container">
+    <h2>Configuration des utilisateurs (admin seulement)</h2>
+    
+    <!-- Formulaire pour ajouter ou modifier un utilisateur -->
+    <form id="user-form">
+        <input type="hidden" id="editingUserIndex" value="-1">
+        <label for="username">Nom d'utilisateur :</label>
+        <input type="text" id="username" required>
 
-    <label for="password">Mot de passe :</label>
-    <input type="password" id="password" required>
+        <label for="password">Mot de passe :</label>
+        <input type="password" id="password" required>
 
-    <h3>Niveau d'accréditation :</h3>
-    <label><input type="radio" name="accreditation" value="1" required> Niveau 1</label>
-    <label><input type="radio" name="accreditation" value="2"> Niveau 2</label>
-    <label><input type="radio" name="accreditation" value="3"> Niveau 3</label>
-    <label><input type="radio" name="accreditation" value="4"> Niveau 4</label>
-    <label><input type="radio" name="accreditation" value="admin"> Admin</label>
+        <h3>Niveau d'accréditation :</h3>
+        <label><input type="radio" name="accreditation" value="1" required> Niveau 1</label>
+        <label><input type="radio" name="accreditation" value="2"> Niveau 2</label>
+        <label><input type="radio" name="accreditation" value="3"> Niveau 3</label>
+        <label><input type="radio" name="accreditation" value="4"> Niveau 4</label>
+        <label><input type="radio" name="accreditation" value="admin"> Admin</label>
 
-    <button type="submit">Ajouter l'utilisateur</button>
-</form>
+        <button type="submit">Enregistrer l'utilisateur</button>
+    </form>
+
+    <!-- Bouton pour retourner à la page d'accueil -->
+    <button onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
+
+    <!-- Liste des utilisateurs -->
+    <h3>Liste des utilisateurs</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom d'utilisateur</th>
+                <th>Mot de passe</th>
+                <th>Accréditation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="user-list">
+            <!-- Liste dynamique des utilisateurs -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const user = JSON.parse(localStorage.getItem('loggedInUser'));
+
+        if (!user || user.accreditation !== 'admin') {
+            alert("Accès refusé. Vous n'êtes pas administrateur.");
+            window.location.href = 'homepage.html'; // Redirection si non admin
+        }
+
+        // Charger la liste des utilisateurs à partir du localStorage
+        function loadUsers() {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const userList = document.getElementById('user-list');
+            userList.innerHTML = '';
+
+            users.forEach((user, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.password}</td>
+                    <td>${user.accreditation}</td>
+                    <td>
+                        <button class="edit-button" onclick="editUser(${index})">Modifier</button>
+                        <button class="delete-button" onclick="deleteUser(${index})">❌</button>
+                    </td>
+                `;
+                userList.appendChild(tr);
+            });
+        }
+
+        // Ajouter ou modifier un utilisateur
+        document.getElementById('user-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const accreditation = document.querySelector('input[name="accreditation"]:checked').value;
+
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const editingIndex = document.getElementById('editingUserIndex').value;
+
+            if (editingIndex == -1) {
+                // Ajouter un nouvel utilisateur
+                users.push({ username, password, accreditation });
+            } else {
+                // Modifier l'utilisateur existant
+                users[editingIndex] = { username, password, accreditation };
+            }
+
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers();
+
+            // Réinitialiser le formulaire
+            document.getElementById('user-form').reset();
+            document.getElementById('editingUserIndex').value = -1;
+        });
+
+        // Fonction pour supprimer un utilisateur
+        window.deleteUser = function(index) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            users.splice(index, 1); // Supprimer l'utilisateur de la liste
+            localStorage.setItem('users', JSON.stringify(users));
+            loadUsers(); // Recharger la liste des utilisateurs
+        };
+
+        // Fonction pour modifier un utilisateur
+        window.editUser = function(index) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const user = users[index];
+
+            document.getElementById('username').value = user.username;
+            document.getElementById('password').value = user.password;
+            document.querySelector(`input[name="accreditation"][value="${user.accreditation}"]`).checked = true;
+            document.getElementById('editingUserIndex').value = index;
+        };
+
+        // Charger la liste des utilisateurs au démarrage
+        loadUsers();
+    });
+</script>
 
 </body>
 </html>
+
 
