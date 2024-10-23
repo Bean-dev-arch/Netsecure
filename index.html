@@ -19,4 +19,77 @@
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
-            width: 
+            width: 300px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Connexion</h2>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Nom d'utilisateur" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button type="submit">Se connecter</button>
+        <p class="error" id="error-message">Identifiant ou mot de passe incorrect</p>
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Ajouter "MonIdentifiant" en tant qu'administrateur s'il n'existe pas déjà
+        const users = JSON.parse(localStorage.getItem('users')) || [];
+        const adminExists = users.some(user => user.username === 'MonIdentifiant');
+
+        if (!adminExists) {
+            users.push({ username: 'MonIdentifiant', password: 'adminPassword', accreditation: 'admin' });
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        // Gestion du formulaire de connexion
+        document.getElementById('login-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            // Vérification des identifiants
+            const user = users.find(user => user.username === username && user.password === password);
+
+            if (user) {
+                localStorage.setItem('loggedInUser', JSON.stringify(user)); // Stocker l'utilisateur connecté
+                window.location.href = 'homepage.html'; // Rediriger vers la page d'accueil
+            } else {
+                document.getElementById('error-message').style.display = 'block'; // Afficher le message d'erreur
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
+
