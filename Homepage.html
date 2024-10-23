@@ -89,7 +89,7 @@
         <a href="affaires-en-cours.html">Affaires en cours</a>
         <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
         <a href="most-wanted.html">Most Wanted</a>
-        <button id="config-link" style="display:none;">Configuration (admin seulement)</button>
+        <button id="config-link" style="display:none;" onclick="goToConfig()">Configuration (admin seulement)</button>
         <button onclick="logout()">Déconnexion</button>
     </div>
 </div>
@@ -112,10 +112,17 @@
         const inbox = JSON.parse(localStorage.getItem(loggedInUser.username + '_inbox')) || [];
         document.getElementById('message-count').textContent = inbox.length;
 
-        // Si l'utilisateur est admin, afficher le lien vers la configuration
+        // Si l'utilisateur est admin, afficher le lien vers la configuration et ajouter un événement onclick
         if (loggedInUser.accreditation === 'admin') {
-            document.getElementById('config-link').style.display = 'block';
+            const configLink = document.getElementById('config-link');
+            configLink.style.display = 'block';
+            configLink.onclick = goToConfig;
         }
+    }
+
+    // Fonction pour rediriger vers la page de configuration
+    function goToConfig() {
+        window.location.href = 'config.html'; // Rediriger vers la page de configuration
     }
 
     // Fonction de déconnexion
