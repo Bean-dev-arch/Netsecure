@@ -100,6 +100,10 @@
         <option value="admin">Admin</option>
     </select>
 
+    <!-- Champ pour ajouter des détails -->
+    <label for="case-details">Détails de l'affaire :</label>
+    <textarea id="case-details" placeholder="Ajouter des détails..." required></textarea>
+
     <button id="save-case-btn">Enregistrer l'affaire</button>
     <button id="cancel-create-btn">Annuler</button>
 </div>
@@ -168,13 +172,15 @@
     document.getElementById('save-case-btn').addEventListener('click', function() {
         const caseName = document.getElementById('case-name').value;
         const caseAccreditation = document.getElementById('case-accreditation').value;
+        const caseDetails = document.getElementById('case-details').value;
 
-        if (caseName && caseAccreditation) {
+        if (caseName && caseAccreditation && caseDetails) {
             const newCase = {
                 name: caseName,
                 accreditation: caseAccreditation,
                 creator: loggedInUser.username,
                 creationDate: new Date().toISOString(),
+                details: caseDetails,
                 notes: []
             };
 
@@ -188,6 +194,8 @@
 
             document.getElementById('create-case-form').style.display = 'none';
             displayCases();
+        } else {
+            alert("Veuillez remplir tous les champs.");
         }
     });
 
@@ -241,4 +249,3 @@
 
 </body>
 </html>
-
