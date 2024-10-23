@@ -37,31 +37,28 @@
         }
         .delete-button {
             background-color: red;
+            color: white;
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
         }
         .delete-button:hover {
             background-color: darkred;
         }
-        .create-case-form {
-            margin-top: 20px;
-            width: 50%;
+        .note-container {
             display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
-        input, select {
+        textarea, input {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #ccc;
             border-radius: 4px;
-        }
-        .form-actions {
-            display: flex;
-            justify-content: space-between;
-        }
-        .back-button {
-            background-color: #007bff;
-        }
-        .back-button:hover {
-            background-color: #0056b3;
         }
     </style>
 </head>
@@ -89,7 +86,7 @@
 <button id="create-case-btn">Créer une nouvelle affaire</button>
 
 <!-- Formulaire pour créer une affaire -->
-<div class="create-case-form" id="create-case-form">
+<div class="create-case-form" id="create-case-form" style="display:none;">
     <h3>Nouvelle affaire</h3>
     <label for="case-name">Nom de l'affaire :</label>
     <input type="text" id="case-name" placeholder="Nom de l'affaire" required>
@@ -103,14 +100,9 @@
         <option value="admin">Admin</option>
     </select>
 
-    <div class="form-actions">
-        <button id="save-case-btn">Enregistrer l'affaire</button>
-        <button id="cancel-create-btn" type="button">Annuler</button>
-    </div>
+    <button id="save-case-btn">Enregistrer l'affaire</button>
+    <button id="cancel-create-btn">Annuler</button>
 </div>
-
-<!-- Bouton pour retourner à la page d'accueil -->
-<button class="back-button" onclick="window.location.href='homepage.html'">Retour à la page d'accueil</button>
 
 <script>
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
@@ -131,17 +123,37 @@
             if (canAccessCase(affaire.accreditation)) {
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><a href="affaire-detail.html?id=${index}">${affaire.name}</a></td>
+                    <td>${affaire.name}</td>
                     <td>${affaire.accreditation}</td>
                     <td>${affaire.creator}</td>
                     <td>${new Date(affaire.creationDate).toLocaleString()}</td>
                     <td>
+                        <button onclick="toggleDetails(${index})">Voir les détails</button>
                         ${loggedInUser.accreditation === 'admin' ? `<button class="delete-button" onclick="deleteCase(${index})">Supprimer</button>` : ''}
                     </td>
                 `;
                 affairesList.appendChild(tr);
+
+                const noteContainer = document.createElement('div');
+                noteContainer.classList.add('note-container');
+                noteContainer.setAttribute('id', `note-container-${index}`);
+                noteContainer.innerHTML = `
+                    <h4>Détails :</h4>
+                    <p>${affaire.details || "Pas de détails disponibles."}</p>
+                    <h4>Notes :</h4>
+                    <div id="notes-list-${index}">${renderNotes(affaire.notes || [])}</div>
+                    <textarea id="new-note-${index}" placeholder="Ajouter une note..." required></textarea>
+                    <button onclick="addNote(${index})">Ajouter la note</button>
+                `;
+                affairesList.appendChild(noteContainer);
             }
         });
+    }
+
+    // Rendre visibles ou cacher les détails
+    function toggleDetails(index) {
+        const noteContainer = document.getElementById(`note-container-${index}`);
+        noteContainer.style.display = noteContainer.style.display === 'none' || noteContainer.style.display === '' ? 'block' : 'none';
     }
 
     // Créer une nouvelle affaire
@@ -162,7 +174,8 @@
                 name: caseName,
                 accreditation: caseAccreditation,
                 creator: loggedInUser.username,
-                creationDate: new Date().toISOString()
+                creationDate: new Date().toISOString(),
+                notes: []
             };
 
             if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
@@ -177,6 +190,41 @@
             displayCases();
         }
     });
+
+    // Ajouter une nouvelle note
+    function addNote(caseIndex) {
+        const newNoteContent = document.getElementById(`new-note-${caseIndex}`).value.trim();
+        if (!newNoteContent) {
+            alert("Veuillez écrire une note avant de l'ajouter.");
+            return;
+        }
+
+        const newNote = {
+            author: loggedInUser.username,
+            timestamp: new Date().toISOString(),
+            content: newNoteContent
+        };
+
+        cases[caseIndex].notes.push(newNote);
+        localStorage.setItem('affaires', JSON.stringify(cases));
+
+        document.getElementById(`new-note-${caseIndex}`).value = '';
+        document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes);
+    }
+
+    // Rendre les notes visibles
+    function renderNotes(notes) {
+        if (notes.length === 0) {
+            return "<p>Aucune note ajoutée pour l'instant.</p>";
+        }
+
+        return notes.map(note => `
+            <div class="note">
+                <p><strong>${note.author}</strong> (${new Date(note.timestamp).toLocaleString()})</p>
+                <p>${note.content}</p>
+            </div>
+        `).join('');
+    }
 
     // Supprimer une affaire (admin seulement)
     function deleteCase(index) {
