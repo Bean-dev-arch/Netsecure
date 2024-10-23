@@ -4,32 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page d'accueil</title>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            const user = JSON.parse(localStorage.getItem('loggedInUser'));
+
+            if (user && user.accreditation === 'admin') {
+                document.getElementById('config-link').style.display = 'block'; // Afficher le lien configuration pour admin
+            }
+        });
+    </script>
 </head>
 <body>
 
 <h1>Bienvenue sur la page d'accueil</h1>
-
-<!-- Lien vers la page "Rapports" -->
-<a href="reports.html">Envoyer un rapport</a>
-
-<!-- Bouton pour accéder à la boîte de réception -->
-<button onclick="goToInbox()">Accéder à ma boîte de réception</button>
-
-<script>
-    // Simule l'utilisateur connecté (tu devrais le récupérer lors de la connexion)
-    const loggedInUser = 'user1';  // Remplace par l'identifiant de l'utilisateur connecté
-    localStorage.setItem('loggedInUser', loggedInUser);
-
-    // Fonction pour rediriger l'utilisateur vers sa boîte de réception
-    function goToInbox() {
-        const currentUser = localStorage.getItem('loggedInUser');  // Récupère l'utilisateur connecté depuis localStorage
-        if (currentUser) {
-            window.location.href = `inbox.html?user=${currentUser}`;  // Redirige vers la boîte de réception de l'utilisateur
-        } else {
-            alert("Aucun utilisateur connecté !");
-        }
-    }
-</script>
+<ul>
+    <li><a href="inbox.html">Accéder à ma boîte de réception</a></li>
+    <li><a href="reports.html">Envoyer un rapport</a></li>
+    <li id="config-link" style="display:none;"><a href="config.html">Configuration (admin seulement)</a></li>
+</ul>
 
 </body>
 </html>
