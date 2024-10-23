@@ -91,14 +91,18 @@
 <!-- Bouton pour revenir à la page d'accueil -->
 <button class="back-button" onclick="window.location.href='homepage.html'">Retour à la homepage</button>
 
-<!-- Inclusion du script d'authentification -->
-<script src="auth.js"></script>
-
 <script>
-    // Afficher les utilisateurs existants
-    function displayUsers() {
+    // Fonction pour récupérer les utilisateurs via Netlify Function
+    async function getUsers() {
+        const response = await fetch('/.netlify/functions/manageUsers');
+        const users = await response.json();
+        return users;
+    }
+
+    // Fonction pour afficher les utilisateurs
+    async function displayUsers() {
+        const users = await getUsers();
         const userList = document.getElementById('user-list');
-        const users = JSON.parse(localStorage.getItem('users')) || [];
         userList.innerHTML = '';
 
         users.forEach((user, index) => {
@@ -116,50 +120,35 @@
         });
     }
 
-    // Ajouter un utilisateur
-    function addUser() {
+    // Fonction pour ajouter un utilisateur via Netlify Function
+    async function addUser() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         const accreditation = document.getElementById('accreditation').value;
 
-        if (username && password) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            const newUser = { username, password, accreditation };
-            users.push(newUser);
-            localStorage.setItem('users', JSON.stringify(users));
-            displayUsers();
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
+        const response = await fetch('/.netlify/functions/manageUsers', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, accreditation })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            displayUsers(); // Mettre à jour la liste
         } else {
-            alert('Veuillez remplir tous les champs.');
+            alert(result.message);
         }
     }
 
-    // Modifier un utilisateur
+    // Modifier un utilisateur (à implémenter via Netlify Function)
     function editUser(index) {
-        const users = JSON.parse(localStorage.getItem('users')) || [];
-        const user = users[index];
-        const newUsername = prompt("Modifier le nom d'utilisateur :", user.username);
-                const newPassword = prompt("Modifier le mot de passe :", user.password);
-        const newAccreditation = prompt("Modifier le niveau d'accréditation :", user.accreditation);
-
-        if (newUsername && newPassword && newAccreditation) {
-            users[index] = { username: newUsername, password: newPassword, accreditation: newAccreditation };
-            localStorage.setItem('users', JSON.stringify(users));
-            displayUsers();
-        } else {
-            alert("Tous les champs doivent être remplis.");
-        }
+        alert("La fonctionnalité de modification doit être implémentée côté serveur.");
     }
 
-    // Supprimer un utilisateur
+    // Supprimer un utilisateur (à implémenter via Netlify Function)
     function deleteUser(index) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
-            const users = JSON.parse(localStorage.getItem('users')) || [];
-            users.splice(index, 1);
-            localStorage.setItem('users', JSON.stringify(users));
-            displayUsers();
-        }
+        alert("La fonctionnalité de suppression doit être implémentée côté serveur.");
     }
 
     // Charger les utilisateurs au démarrage
