@@ -51,9 +51,34 @@
             background-color: #f9f9f9;
             border-radius: 4px;
         }
+        .delete-button {
+            background-color: red;
+            color: white;
+            cursor: pointer;
+            border: none;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        .delete-button:hover {
+            background-color: darkred;
+        }
+        .back-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
+        .back-button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
+
+<!-- Bouton retour à la homepage -->
+<button class="back-button" onclick="window.location.href='affaires-en-cours.html'">Retour aux affaires</button>
 
 <div class="container">
     <h1 id="case-title">Détails de l'affaire</h1>
@@ -79,7 +104,6 @@
     </div>
 </div>
 
-<!-- Script pour charger les détails de l'affaire et gérer les ajouts de notes -->
 <script>
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     const urlParams = new URLSearchParams(window.location.search);
@@ -113,12 +137,13 @@
 
     function displayNotes() {
         notesList.innerHTML = ''; // Vider la liste des notes
-        caseNotes.forEach(note => {
+        caseNotes.forEach((note, index) => {
             const noteDiv = document.createElement('div');
             noteDiv.classList.add('note');
             noteDiv.innerHTML = `
                 <p><strong>${note.author}</strong> (${new Date(note.timestamp).toLocaleString()})</p>
                 <p>${note.content}</p>
+                ${loggedInUser.accreditation === 'admin' ? `<button class="delete-button" onclick="deleteNote(${index})">Supprimer la note</button>` : ''}
             `;
             notesList.appendChild(noteDiv);
         });
@@ -149,6 +174,21 @@
         document.getElementById('new-note').value = '';
         displayNotes();
     });
+
+    // Supprimer une note (admin seulement)
+    function deleteNote(index) {
+        if (confirm("Êtes-vous sûr de vouloir supprimer cette note ?")) {
+            caseNotes.splice(index, 1);
+            selectedCase.notes = caseNotes;
+            cases[caseId] = selectedCase;
+
+            // Mettre à jour le localStorage
+            localStorage.setItem('affaires', JSON.stringify(cases));
+
+            // Réafficher les notes
+            displayNotes();
+        }
+    }
 </script>
 
 </body>
