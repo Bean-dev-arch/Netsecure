@@ -70,6 +70,34 @@
         .note-image {
             max-width: 100px;
             margin-top: 10px;
+            cursor: pointer;
+        }
+        /* Styles pour la modale d'affichage en plein écran */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+        .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: white;
+            color: black;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -122,6 +150,12 @@
     <button id="cancel-create-btn">Annuler</button>
 </div>
 
+<!-- Modale pour afficher l'image en plein écran -->
+<div id="image-modal" class="modal">
+    <button class="close-modal" onclick="closeModal()">×</button>
+    <img id="modal-image" src="">
+</div>
+
 <script>
     const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
     const cases = JSON.parse(localStorage.getItem('affaires')) || [];
@@ -168,7 +202,7 @@
                     <h4>Détails :</h4>
                     <p>${affaire.details || "Pas de détails disponibles."}</p>
                     <h4>Notes :</h4>
-                    <div id="notes-list-${index}">${renderNotes(affaire.notes || [])}</div>
+                    <div id="notes-list-${index}">${renderNotes(affaire.notes || [], index)}</div>
                     <textarea id="new-note-${index}" placeholder="Ajouter une note..." required></textarea>
                     <input type="file" id="note-image-${index}" accept="image/*">
                     <button onclick="addNote(${index})">Ajouter la note</button>
@@ -208,6 +242,7 @@
                 notes: []
             };
 
+            if (caseAccreditation === 'admin' && loggedInUser
             if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
                 alert("Seuls les administrateurs peuvent créer des affaires de niveau Admin.");
                 return;
@@ -239,22 +274,21 @@
             const reader = new FileReader();
             reader.onload = function(event) {
                 noteImageURL = event.target.result;
-                                saveNoteWithImage(caseIndex, newNoteContent, noteImageURL);
+                saveNoteWithImage(caseIndex, newNoteContent, noteImageURL);
             };
             reader.readAsDataURL(noteImageInput.files[0]);
         } else {
-            // Si aucune image n'est sélectionnée, sauvegarder simplement la note
-            saveNoteWithImage(caseIndex, newNoteContent, '');
+            saveNoteWithImage(caseIndex, newNoteContent, noteImageURL);
         }
     }
 
     // Sauvegarder la note avec ou sans image
-    function saveNoteWithImage(caseIndex, content, imageUrl) {
+    function saveNoteWithImage(caseIndex, content, imageURL) {
         const newNote = {
             author: loggedInUser.username,
             timestamp: new Date().toISOString(),
             content: content,
-            image: imageUrl
+            image: imageURL
         };
 
         cases[caseIndex].notes.push(newNote);
@@ -262,22 +296,33 @@
 
         document.getElementById(`new-note-${caseIndex}`).value = '';
         document.getElementById(`note-image-${caseIndex}`).value = ''; // Réinitialiser l'input d'image
-        document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes);
+        document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes, caseIndex);
     }
 
     // Rendre les notes visibles
-    function renderNotes(notes) {
+    function renderNotes(notes, caseIndex) {
         if (notes.length === 0) {
             return "<p>Aucune note ajoutée pour l'instant.</p>";
         }
 
-        return notes.map(note => `
+        return notes.map((note, noteIndex) => `
             <div class="note">
                 <p><strong>${note.author}</strong> (${new Date(note.timestamp).toLocaleString()})</p>
                 <p>${note.content}</p>
-                ${note.image ? `<img src="${note.image}" alt="Image de la note" class="note-image">` : ''}
+                ${note.image ? `<img src="${note.image}" alt="Image de la note" class="note-image" onclick="openModal('${note.image}')">` : ''}
             </div>
         `).join('');
+    }
+
+    // Ouvrir l'image dans la modale pour l'afficher en plein écran
+    function openModal(imageSrc) {
+        document.getElementById('modal-image').src = imageSrc;
+        document.getElementById('image-modal').style.display = 'flex';
+    }
+
+    // Fermer la modale d'image
+    function closeModal() {
+        document.getElementById('image-modal').style.display = 'none';
     }
 
     // Supprimer une affaire (admin seulement)
@@ -302,4 +347,5 @@
 
 </body>
 </html>
+
 
