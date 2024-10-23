@@ -77,7 +77,6 @@
         .back-button:hover {
             background-color: #0056b3;
         }
-        /* Style du conteneur des notes */
         #notes-list {
             margin-top: 20px;
         }
@@ -168,44 +167,48 @@
             return;
         }
 
+        // Ajouter la nouvelle note
         const newNote = {
             author: loggedInUser.username,
             timestamp: new Date().toISOString(),
             content: newNoteContent
         };
 
+        // Mettre à jour les notes de l'affaire sélectionnée
         caseNotes.push(newNote);
         selectedCase.notes = caseNotes;
         cases[caseId] = selectedCase;
 
-        try {
-            localStorage.setItem('affaires', JSON.stringify(cases));
-            // Vider le champ de saisie et réafficher les notes
-            document.getElementById('new-note').value = '';
-            displayNotes();
-        } catch (e) {
-            alert("Erreur lors de la sauvegarde des données.");
-            console.error(e);
-        }
+        // Sauvegarder les modifications dans le localStorage
+        localStorage.setItem('affaires', JSON.stringify(cases));
+
+        // Réinitialiser le champ de texte
+        document.getElementById('new-note').value = '';
+
+        // Afficher les notes mises à jour
+        displayNotes();
     });
 
     // Supprimer une note (admin seulement)
     function deleteNote(index) {
         if (confirm("Êtes-vous sûr de vouloir supprimer cette note ?")) {
+            // Supprimer la note
             caseNotes.splice(index, 1);
             selectedCase.notes = caseNotes;
             cases[caseId] = selectedCase;
 
-            try {
-                localStorage.setItem('affaires', JSON.stringify(cases));
-                alert("Note supprimée avec succès.");
-                displayNotes();
-            } catch (e) {
-                alert("Erreur lors de la suppression de la note.");
-                console.error(e);
-            }
+            // Mettre à jour le localStorage
+            localStorage.setItem('affaires', JSON.stringify(cases));
+
+            // Réafficher les notes
+            displayNotes();
         }
     }
+</script>
+
+</body>
+</html>
+
 </script>
 
 </body>
