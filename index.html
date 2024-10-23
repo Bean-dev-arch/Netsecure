@@ -1,1 +1,88 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page de connexion</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .login-container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            width: 300px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #28a745;
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .error {
+            color: red;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>Connexion</h2>
+    <form id="login-form">
+        <input type="text" id="username" placeholder="Identifiant" required>
+        <input type="password" id="password" placeholder="Mot de passe" required>
+        <button type="submit">Se connecter</button>
+        <p class="error" id="error-message">Identifiant ou mot de passe incorrect</p>
+    </form>
+</div>
+
+<script>
+  // Identifiants et mots de passe corrects (à ne pas utiliser dans une vraie application)
+  const validUsername = "monIdentifiant";
+  const validPassword = "monMotDePasse";
+
+  // Fonction pour gérer la connexion
+  document.getElementById("login-form").addEventListener("submit", function(e) {
+    e.preventDefault(); // Empêche la soumission du formulaire par défaut
+
+    // Récupère les valeurs saisies
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    // Vérifie si les identifiants sont corrects
+    if (username === validUsername && password === validPassword) {
+      // Redirige vers la page d'accueil protégée si les identifiants sont corrects
+      window.location.href = '/homepage.html';
+    } else {
+      // Affiche un message d'erreur si les identifiants sont incorrects
+      document.getElementById("error-message").style.display = 'block';
+    }
+  });
+</script>
+
+</body>
+</html>
 
