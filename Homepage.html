@@ -3,28 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Page d'accueil protégée</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .container {
-            text-align: center;
-        }
-    </style>
+    <title>Page d'accueil</title>
 </head>
 <body>
 
-<div class="container">
-    <h1>Bienvenue sur la page d'accueil protégée</h1>
-    <p>Vous êtes maintenant connecté.</p>
-</div>
+<h1>Bienvenue sur la page d'accueil</h1>
+
+<!-- Lien vers la page "Rapports" -->
+<a href="reports.html">Envoyer un rapport</a>
+
+<!-- Bouton pour accéder à la boîte de réception -->
+<button onclick="goToInbox()">Accéder à ma boîte de réception</button>
+
+<script>
+    // Fonction pour rediriger l'utilisateur vers sa boîte de réception
+    function goToInbox() {
+        const currentUser = localStorage.getItem('loggedInUser');  // Récupère
+
     
 <a href="reports.html">Envoyer un rapport</a>
     
