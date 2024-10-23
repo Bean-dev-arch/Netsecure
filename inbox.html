@@ -21,16 +21,29 @@
 
     // Récupère l'utilisateur depuis l'URL
     const currentUser = getQueryParam('user');
+    
+    // Vérifie si l'utilisateur est bien identifié
+    if (!currentUser) {
+        document.body.innerHTML = "<h1>Erreur : Utilisateur non trouvé</h1>";
+        return;
+    }
+
+    // Récupère les messages de la boîte de réception de l'utilisateur
     const messages = JSON.parse(localStorage.getItem(currentUser + '_inbox')) || [];
 
     // Affiche les messages reçus dans une liste
     const messageList = document.getElementById('message-list');
-    messages.forEach(message => {
-        const li = document.createElement('li');
-        li.textContent = `Objet: ${message.subject} - Corps: ${message.body}`;
-        messageList.appendChild(li);
-    });
+    if (messages.length === 0) {
+        messageList.innerHTML = "<li>Aucun message dans la boîte de réception.</li>";
+    } else {
+        messages.forEach(message => {
+            const li = document.createElement('li');
+            li.textContent = `Objet: ${message.subject} - Corps: ${message.body}`;
+            messageList.appendChild(li);
+        });
+    }
 </script>
 
 </body>
 </html>
+
