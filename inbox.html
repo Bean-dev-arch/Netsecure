@@ -7,33 +7,81 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            background-color: #000; /* Fond noir */
+            color: #ffffff;
+            margin: 0;
+            height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            height: 100vh;
-            margin: 0;
         }
+
+        /* Menu déroulant en haut à droite */
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #000;
+            padding: 10px;
+            border-radius: 4px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #000;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #575757;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
         .container {
-            background-color: white;
+            background-color: #333;
             padding: 20px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             width: 600px;
             max-height: 80vh;
             overflow-y: auto;
+            color: #ffffff;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
         }
+
         th, td {
             padding: 10px;
             border: 1px solid #ddd;
             text-align: left;
+            color: #ffffff;
         }
+
         button {
             padding: 10px;
             background-color: #28a745;
@@ -42,12 +90,15 @@
             cursor: pointer;
             border-radius: 4px;
         }
+
         button:hover {
             background-color: #218838;
         }
+
         .delete-button {
             background-color: red;
         }
+
         .delete-button:hover {
             background-color: darkred;
         }
@@ -55,6 +106,19 @@
 </head>
 <body>
 
+<!-- Menu déroulant en haut à droite -->
+<div class="dropdown">
+    Menu
+    <div class="dropdown-content">
+        <a href="homepage.html">Retour à la homepage</a>
+        <a href="rapport.html">Envoyer un rapport</a>
+        <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
+        <a href="most-wanted.html">Most Wanted</a>
+        <button onclick="logout()">Déconnexion</button>
+    </div>
+</div>
+
+<!-- Conteneur centré -->
 <div class="container">
     <h1>Boîte de réception</h1>
 
@@ -211,8 +275,13 @@
     // Charger les messages et les dossiers au démarrage
     displayMessages();
     displayFolders();
+
+    // Fonction de déconnexion
+    function logout() {
+        localStorage.removeItem('loggedInUser');
+        window.location.href = 'index.html'; // Rediriger vers la page de connexion
+    }
 </script>
 
 </body>
 </html>
-
