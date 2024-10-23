@@ -11,6 +11,13 @@ exports.handler = async (event) => {
     if (method === 'GET') {
         try {
             console.log("Tentative de lecture du fichier users.json...");
+            if (!fs.existsSync(usersFilePath)) {
+                console.error('Le fichier users.json n\'existe pas.');
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({ message: 'Le fichier users.json est introuvable.' }),
+                };
+            }
             const usersData = fs.readFileSync(usersFilePath, 'utf-8');
             console.log("Fichier users.json lu avec succès.");
             return {
@@ -66,4 +73,3 @@ exports.handler = async (event) => {
         body: 'Méthode non autorisée.',
     };
 };
-
