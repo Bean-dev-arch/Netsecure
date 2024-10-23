@@ -1,25 +1,44 @@
-// Définition des identifiants valides (à ne pas utiliser en production)
-const validUsername = "monIdentifiant";
-const validPassword = "monMotDePasse";
+// Précharger les utilisateurs par défaut si localStorage ne contient pas encore de 'users'
+if (!localStorage.getItem('users')) {
+    const defaultUsers = [
+        { username: 'admin', password: 'adminpass', accreditation: 'admin' },
+        { username: 'user1', password: 'user1pass', accreditation: '1' },
+        { username: 'user2', password: 'user2pass', accreditation: '2' }
+    ];
+    localStorage.setItem('users', JSON.stringify(defaultUsers));
+}
 
-// Fonction pour gérer la connexion
-function handleLogin(event) {
-    event.preventDefault(); // Empêche la soumission du formulaire par défaut
+// Fonction de connexion
+function login() {
+    const usernameInput = document.getElementById('username').value;
+    const passwordInput = document.getElementById('password').value;
+    const users = JSON.parse(localStorage.getItem('users')) || [];
 
-    // Récupère les valeurs saisies par l'utilisateur
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+    const user = users.find(u => u.username === usernameInput && u.password === passwordInput);
 
-    // Vérifie si les identifiants sont corrects
-    if (username === validUsername && password === validPassword) {
-        // Redirige vers la page d'accueil protégée si les identifiants sont corrects
-        window.location.href = '/homepage.html';
+    if (user) {
+        // Connexion réussie
+        localStorage.setItem('loggedInUser', JSON.stringify(user));
+        window.location.href = 'homepage.html'; // Rediriger après connexion réussie
     } else {
-        // Affiche un message d'erreur si les identifiants sont incorrects
-        document.getElementById("error-message").style.display = 'block';
+        // Erreur de connexion
+        alert('Identifiant ou mot de passe incorrect');
     }
 }
 
-// Ajoute un écouteur d'événements au formulaire pour gérer la soumission
-document.getElementById("login-form").addEventListener("submit", handleLogin);
+// Fonction de déconnexion
+function logout() {
+    localStorage.removeItem('loggedInUser');
+    window.location.href = 'index.html'; // Rediriger vers la page de connexion
+}
+
+// Vérifier si un utilisateur est connecté
+function checkIfLoggedIn() {
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+
+    if (!loggedInUser) {
+        // Si aucun utilisateur n'est connecté, rediriger vers la page de connexion
+        window.location.href = 'index.html';
+    }
+}
 
