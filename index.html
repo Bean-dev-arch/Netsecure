@@ -59,30 +59,10 @@
     </form>
 </div>
 
-<script>
-  // Identifiants et mots de passe corrects (à ne pas utiliser dans une vraie application)
-  const validUsername = "monIdentifiant";
-  const validPassword = "monMotDePasse";
-
-  // Fonction pour gérer la connexion
-  document.getElementById("login-form").addEventListener("submit", function(e) {
-    e.preventDefault(); // Empêche la soumission du formulaire par défaut
-
-    // Récupère les valeurs saisies
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    // Vérifie si les identifiants sont corrects
-    if (username === validUsername && password === validPassword) {
-      // Redirige vers la page d'accueil protégée si les identifiants sont corrects
-      window.location.href = '/homepage.html';
-    } else {
-      // Affiche un message d'erreur si les identifiants sont incorrects
-      document.getElementById("error-message").style.display = 'block';
-    }
-  });
-</script>
+<!-- Inclusion du fichier JavaScript auth.js -->
+<script src="auth.js"></script>
 
 </body>
 </html>
+
 
