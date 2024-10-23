@@ -242,8 +242,7 @@
                 notes: []
             };
 
-            if (caseAccreditation === 'admin' && loggedInUser
-            if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
+                       if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
                 alert("Seuls les administrateurs peuvent créer des affaires de niveau Admin.");
                 return;
             }
@@ -347,5 +346,3 @@
 
 </body>
 </html>
-
-
