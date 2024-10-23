@@ -91,12 +91,14 @@
 <!-- Bouton pour revenir à la page d'accueil -->
 <button class="back-button" onclick="window.location.href='homepage.html'">Retour à la homepage</button>
 
-<script>
-    const users = JSON.parse(localStorage.getItem('users')) || [];
+<!-- Inclusion du script d'authentification -->
+<script src="auth.js"></script>
 
+<script>
     // Afficher les utilisateurs existants
     function displayUsers() {
         const userList = document.getElementById('user-list');
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         userList.innerHTML = '';
 
         users.forEach((user, index) => {
@@ -121,6 +123,7 @@
         const accreditation = document.getElementById('accreditation').value;
 
         if (username && password) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
             const newUser = { username, password, accreditation };
             users.push(newUser);
             localStorage.setItem('users', JSON.stringify(users));
@@ -134,9 +137,10 @@
 
     // Modifier un utilisateur
     function editUser(index) {
+        const users = JSON.parse(localStorage.getItem('users')) || [];
         const user = users[index];
         const newUsername = prompt("Modifier le nom d'utilisateur :", user.username);
-        const newPassword = prompt("Modifier le mot de passe :", user.password);
+                const newPassword = prompt("Modifier le mot de passe :", user.password);
         const newAccreditation = prompt("Modifier le niveau d'accréditation :", user.accreditation);
 
         if (newUsername && newPassword && newAccreditation) {
@@ -151,6 +155,7 @@
     // Supprimer un utilisateur
     function deleteUser(index) {
         if (confirm("Êtes-vous sûr de vouloir supprimer cet utilisateur ?")) {
+            const users = JSON.parse(localStorage.getItem('users')) || [];
             users.splice(index, 1);
             localStorage.setItem('users', JSON.stringify(users));
             displayUsers();
