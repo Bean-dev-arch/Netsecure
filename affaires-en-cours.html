@@ -239,17 +239,9 @@
         return parseInt(loggedInUser.accreditation) >= parseInt(caseAccreditation);
     }
 
-    function filterCases(keyword) {
-        const filteredCases = cases.filter(affaire => {
-            const searchTarget = `${affaire.name} ${affaire.creator} ${affaire.details}`.toLowerCase();
-            return searchTarget.includes(keyword.toLowerCase());
-        });
-        return filteredCases;
-    }
-
     function displayCases(filteredCases = cases) {
         const affairesList = document.getElementById('affaires-list');
-        affairesList.innerHTML = '';
+        affairesList.innerHTML = ''; // Vider la liste des affaires
 
         filteredCases.forEach((affaire, index) => {
             if (canAccessCase(affaire.accreditation)) {
@@ -275,8 +267,6 @@
                     <h4>Notes :</h4>
                     <div id="notes-list-${index}">${renderNotes(affaire.notes || [], index)}</div>
                     <textarea id="new-note-${index}" placeholder="Ajouter une note..." required></textarea>
-                    <input type="file" id="note-image
-
                     <input type="file" id="note-image-${index}" accept="image/*">
                     <button onclick="addNote(${index})">Ajouter la note</button>
                 `;
@@ -285,54 +275,9 @@
         });
     }
 
-    // Rendre visibles ou cacher les détails
-    function toggleDetails(index) {
-        const noteContainer = document.getElementById(`note-container-${index}`);
-        noteContainer.style.display = noteContainer.style.display === 'none' || noteContainer.style.display === '' ? 'block' : 'none';
-    }
-
-    // Créer une nouvelle affaire
-    document.getElementById('create-case-btn').addEventListener('click', function() {
-        document.getElementById('create-case-form').style.display = 'block';
-    });
-
-    document.getElementById('cancel-create-btn').addEventListener('click', function() {
-        document.getElementById('create-case-form').style.display = 'none';
-    });
-
-    document.getElementById('save-case-btn').addEventListener('click', function() {
-        const caseName = document.getElementById('case-name').value;
-        const caseAccreditation = document.getElementById('case-accreditation').value;
-        const caseDetails = document.getElementById('case-details').value;
-
-        if (caseName && caseAccreditation && caseDetails) {
-            const newCase = {
-                name: caseName,
-                accreditation: caseAccreditation,
-                creator: loggedInUser.username,
-                creationDate: new Date().toISOString(),
-                details: caseDetails,
-                notes: []
-            };
-
-            if (caseAccreditation === 'admin' && loggedInUser.accreditation !== 'admin') {
-                alert("Seuls les administrateurs peuvent créer des affaires de niveau Admin.");
-                return;
-            }
-
-            cases.push(newCase);
-            localStorage.setItem('affaires', JSON.stringify(cases));
-
-            document.getElementById('create-case-form').style.display = 'none';
-            displayCases();
-        } else {
-            alert("Veuillez remplir tous les champs.");
-        }
-    });
-
     // Ajouter une nouvelle note avec une image
     function addNote(caseIndex) {
-        const newNoteContent = document.getElementById(`new-note-${caseIndex}`).value.trim();
+               const newNoteContent = document.getElementById(`new-note-${caseIndex}`).value.trim();
         const noteImageInput = document.getElementById(`note-image-${caseIndex}`);
         let noteImageURL = '';
 
@@ -350,7 +295,8 @@
             };
             reader.readAsDataURL(noteImageInput.files[0]);
         } else {
-            saveNoteWithImage(caseIndex, newNoteContent, noteImageURL);
+            // Si aucune image n'est sélectionnée, sauvegarder la note sans image
+            saveNoteWithImage(caseIndex, newNoteContent, '');
         }
     }
 
@@ -363,15 +309,18 @@
             image: imageURL
         };
 
-        cases[caseIndex].notes.push(newNote);
-        localStorage.setItem('affaires', JSON.stringify(cases));
+        cases[caseIndex].notes.push(newNote); // Ajouter la note à l'affaire
+        localStorage.setItem('affaires', JSON.stringify(cases)); // Mettre à jour le localStorage
 
+        // Réinitialiser les champs
         document.getElementById(`new-note-${caseIndex}`).value = '';
-        document.getElementById(`note-image-${caseIndex}`).value = ''; // Réinitialiser l'input d'image
+        document.getElementById(`note-image-${caseIndex}`).value = ''; 
+
+        // Réafficher les notes
         document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes, caseIndex);
     }
 
-    // Rendre les notes visibles
+    // Afficher les notes
     function renderNotes(notes, caseIndex) {
         if (notes.length === 0) {
             return "<p>Aucune note ajoutée pour l'instant.</p>";
@@ -397,7 +346,13 @@
         document.getElementById('image-modal').style.display = 'none';
     }
 
-    // Supprimer une affaire (admin seulement)
+    // Afficher ou cacher les détails d'une affaire
+    function toggleDetails(index) {
+        const noteContainer = document.getElementById(`note-container-${index}`);
+        noteContainer.style.display = noteContainer.style.display === 'none' || noteContainer.style.display === '' ? 'block' : 'none';
+    }
+
+    // Supprimer une affaire
     function deleteCase(index) {
         if (confirm("Êtes-vous sûr de vouloir supprimer cette affaire ?")) {
             cases.splice(index, 1);
@@ -409,7 +364,10 @@
     // Fonction de recherche pour filtrer les affaires
     document.getElementById('search-bar').addEventListener('input', function() {
         const keyword = this.value.trim();
-        const filteredCases = filterCases(keyword);
+        const filteredCases = cases.filter(affaire => {
+            const searchTarget = `${affaire.name} ${affaire.creator} ${affaire.details}`.toLowerCase();
+            return searchTarget.includes(keyword.toLowerCase());
+        });
         displayCases(filteredCases);
     });
 
@@ -425,3 +383,4 @@
 
 </body>
 </html>
+
