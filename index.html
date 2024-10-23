@@ -48,6 +48,56 @@
     </style>
 </head>
 <body>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion</title>
+    <script defer>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Ajouter "MonIdentifiant" en tant qu'admin s'il n'existe pas déjà
+            const users = JSON.parse(localStorage.getItem('users')) || [];
+            const adminExists = users.some(user => user.username === 'MonIdentifiant');
+
+            if (!adminExists) {
+                users.push({ username: 'MonIdentifiant', password: 'adminPassword', accreditation: 'admin' });
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            // Gestion du formulaire de connexion
+            document.getElementById('login-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+
+                // Vérification des identifiants
+                const user = users.find(user => user.username === username && user.password === password);
+
+                if (user) {
+                    localStorage.setItem('loggedInUser', JSON.stringify(user)); // Stocker l'utilisateur connecté
+                    window.location.href = 'homepage.html'; // Rediriger vers la page d'accueil
+                } else {
+                    alert('Identifiant ou mot de passe incorrect');
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<h1>Connexion</h1>
+<form id="login-form">
+    <label for="username">Nom d'utilisateur :</label>
+    <input type="text" id="username" required>
+    <label for="password">Mot de passe :</label>
+    <input type="password" id="password" required>
+    <button type="submit">Se connecter</button>
+</form>
+
+</body>
+</html>
 
 <div class="login-container">
     <h2>Connexion</h2>
