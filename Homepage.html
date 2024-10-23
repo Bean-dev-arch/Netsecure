@@ -13,82 +13,91 @@
             background-position: center; /* L'image est centrée */
             background-repeat: no-repeat; /* Ne pas répéter l'image */
             color: #ffffff; /* Texte en blanc */
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            height: 100vh;
             margin: 0;
-            padding: 0 50px;
-        }
-        .menu {
-            width: 200px;
+            height: 100vh;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
-        a, button {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            text-align: center;
-            font-size: 16px;
+
+        /* Menu déroulant en haut à droite */
+        .dropdown {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #000;
+            padding: 10px;
             border-radius: 4px;
+            color: #ffffff;
+            cursor: pointer;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #000;
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .dropdown-content a, .dropdown-content button {
+            color: #ffffff;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            border: none;
+            background: none;
+            text-align: left;
+            width: 100%;
+        }
+
+        .dropdown-content a:hover, .dropdown-content button:hover {
+            background-color: #575757;
+        }
+
+        .dropdown:hover .dropdown-content {
             display: block;
         }
-        a:hover, button:hover {
-            background-color: #218838;
+
+        /* Centrage du message d'accueil */
+        .center-content {
+            text-align: center;
         }
-        .welcome-message {
-            text-align: right;
-        }
-        .welcome-message h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
-        }
-        .welcome-message p {
-            font-size: 18px;
+
+        .center-content h1 {
+            font-size: 2.5em;
             margin-bottom: 20px;
         }
-        .logout-button {
-            background-color: #dc3545;
-        }
-        .logout-button:hover {
-            background-color: #c82333;
+
+        .center-content p {
+            font-size: 1.2em;
+            color: #dc3545;
         }
     </style>
 </head>
 <body>
 
-<!-- Menu à gauche -->
-<div class="menu">
-    <!-- Lien vers la boîte de réception -->
-    <a href="inbox.html">Accéder à ma boîte de réception</a>
-
-    <!-- Lien vers la page de rapports -->
-    <a href="rapport.html">Envoyer un rapport</a>
-
-    <!-- Lien vers la page Affaires en cours -->
-    <a href="affaires-en-cours.html">Affaires en cours</a>
-
-    <!-- Lien vers la page Dossiers judiciaires -->
-    <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
-
-    <!-- Lien vers la page Most Wanted -->
-    <a href="most-wanted.html">Most Wanted</a>
-
-    <!-- Si l'utilisateur est admin, afficher le lien vers la configuration -->
-    <button id="config-link" style="display:none;" onclick="window.location.href='config.html'">Configuration (admin seulement)</button>
-
-    <!-- Bouton de déconnexion -->
-    <button class="logout-button" onclick="logout()">Déconnexion</button>
+<!-- Menu déroulant en haut à droite -->
+<div class="dropdown">
+    Menu
+    <div class="dropdown-content">
+        <a href="inbox.html">Accéder à ma boîte de réception</a>
+        <a href="rapport.html">Envoyer un rapport</a>
+        <a href="affaires-en-cours.html">Affaires en cours</a>
+        <a href="dossiers-judiciaires.html">Dossiers judiciaires</a>
+        <a href="most-wanted.html">Most Wanted</a>
+        <button id="config-link" style="display:none;">Configuration (admin seulement)</button>
+        <button onclick="logout()">Déconnexion</button>
+    </div>
 </div>
 
-<!-- Message de bienvenue à droite -->
-<div class="welcome-message">
+<!-- Message de bienvenue centré -->
+<div class="center-content">
     <h1>Bienvenue agent <span id="user-name"></span></h1>
-    <p id="unread-messages">Vous avez <span id="message-count">0</span> messages non classés.</p>
+    <p id="unread-messages">Vous avez <span id="message-count">0</span> messages non classés dans votre boîte de réception.</p>
 </div>
 
 <script>
