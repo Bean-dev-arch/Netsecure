@@ -67,6 +67,10 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        .note-image {
+            max-width: 100px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -166,6 +170,7 @@
                     <h4>Notes :</h4>
                     <div id="notes-list-${index}">${renderNotes(affaire.notes || [])}</div>
                     <textarea id="new-note-${index}" placeholder="Ajouter une note..." required></textarea>
+                    <input type="file" id="note-image-${index}" accept="image/*">
                     <button onclick="addNote(${index})">Ajouter la note</button>
                 `;
                 affairesList.appendChild(noteContainer);
@@ -218,28 +223,49 @@
         }
     });
 
-    // Ajouter une nouvelle note
+    // Ajouter une nouvelle note avec une image
     function addNote(caseIndex) {
         const newNoteContent = document.getElementById(`new-note-${caseIndex}`).value.trim();
-        if (!newNoteContent) {
-            alert("Veuillez écrire une note avant de l'ajouter.");
+        const noteImageInput = document.getElementById(`note-image-${caseIndex}`);
+        let noteImageURL = '';
+
+        if (!newNoteContent && !noteImageInput.files.length) {
+            alert("Veuillez écrire une note ou ajouter une image avant de l'ajouter.");
             return;
         }
 
+        // Si une image est sélectionnée, la convertir en URL pour l'afficher
+        if (noteImageInput.files.length > 0) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                noteImageURL = event.target.result;
+                                saveNoteWithImage(caseIndex, newNoteContent, noteImageURL);
+            };
+            reader.readAsDataURL(noteImageInput.files[0]);
+        } else {
+            // Si aucune image n'est sélectionnée, sauvegarder simplement la note
+            saveNoteWithImage(caseIndex, newNoteContent, '');
+        }
+    }
+
+    // Sauvegarder la note avec ou sans image
+    function saveNoteWithImage(caseIndex, content, imageUrl) {
         const newNote = {
             author: loggedInUser.username,
             timestamp: new Date().toISOString(),
-            content: newNoteContent
+            content: content,
+            image: imageUrl
         };
 
         cases[caseIndex].notes.push(newNote);
         localStorage.setItem('affaires', JSON.stringify(cases));
 
         document.getElementById(`new-note-${caseIndex}`).value = '';
+        document.getElementById(`note-image-${caseIndex}`).value = ''; // Réinitialiser l'input d'image
         document.getElementById(`notes-list-${caseIndex}`).innerHTML = renderNotes(cases[caseIndex].notes);
     }
 
-     // Rendre les notes visibles
+    // Rendre les notes visibles
     function renderNotes(notes) {
         if (notes.length === 0) {
             return "<p>Aucune note ajoutée pour l'instant.</p>";
@@ -249,6 +275,7 @@
             <div class="note">
                 <p><strong>${note.author}</strong> (${new Date(note.timestamp).toLocaleString()})</p>
                 <p>${note.content}</p>
+                ${note.image ? `<img src="${note.image}" alt="Image de la note" class="note-image">` : ''}
             </div>
         `).join('');
     }
@@ -275,3 +302,4 @@
 
 </body>
 </html>
+
