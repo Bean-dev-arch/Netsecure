@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Envoyer un rapport</title>
+</head>
+<body>
+
+<h1>Envoyer un rapport</h1>
+
+<!-- Formulaire pour envoyer un rapport -->
+<form id="report-form">
+    <!-- Sélection de l'utilisateur -->
+    <label for="user-select">Sélectionner un utilisateur :</label>
+    <select id="user-select" required>
+        <!-- Ces utilisateurs peuvent être remplis dynamiquement par JavaScript -->
+        <option value="user1">Utilisateur 1</option>
+        <option value="user2">Utilisateur 2</option>
+        <option value="user3">Utilisateur 3</option>
+    </select>
+
+    <!-- Zone de texte pour le sujet -->
+    <label for="subject">Objet :</label>
+    <input type="text" id="subject" placeholder="Entrer l'objet" required>
+
+    <!-- Zone de texte pour le corps du message -->
+    <label for="message-body">Corps :</label>
+    <textarea id="message-body" placeholder="Écrire le corps du message" required></textarea>
+
+    <!-- Bouton pour envoyer le rapport -->
+    <button type="button" onclick="sendReport()">Envoyer en image</button>
+</form>
+
+<!-- Zone pour afficher la confirmation d'envoi -->
+<p id="confirmation-message" style="color:green; display:none;">Message envoyé avec succès !</p>
+
+<!-- Script pour gérer l'envoi des rapports -->
+<script>
+    function sendReport() {
+        // Récupérer les informations du formulaire
+        const user = document.getElementById('user-select').value;
+        const subject = document.getElementById('subject').value;
+        const body = document.getElementById('message-body').value;
+
+        // Créer une image à partir du message (ici un simple alert pour la démo)
+        alert(`Message envoyé à ${user}\nObjet: ${subject}\nCorps: ${body}`);
+
+        // Simuler l'envoi et la réception
+        document.getElementById('confirmation-message').style.display = 'block';
+
+        // Ajouter la logique pour envoyer l'image au serveur (si besoin)
+    }
+</script>
+
+</body>
+</html>
