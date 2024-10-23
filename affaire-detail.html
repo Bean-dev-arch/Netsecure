@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de l'affaire</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            width: 80%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        textarea, input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="case-title">Détails de l'affaire</h1>
+    <p><strong>Niveau d'accréditation requis :</strong> <span id="case-accreditation"></span></p>
+    <p><strong>Créateur :</strong> <span id="case-creator"></span></p>
+    <p><strong>Date de création :</strong> <span id="case-date"></span></p>
+
+    <!-- Détails de l'affaire -->
+    <div id="case-details">
+        <!-- Les détails seront insérés ici -->
+    </div>
+
+    <h3>Ajouter une nouvelle note :</h3>
+    <textarea id="new-note" placeholder="Ajouter une note..." required></textarea>
+    <button id="add-note-btn">Ajouter la note</button>
+</div>
+
+<!-- Section pour afficher les notes -->
+<div class="container">
+    <h3>Notes ajoutées</h3>
+    <div id="notes-list">
+        <!-- Les notes seront affichées ici -->
+    </div>
+</div>
+
+<!-- Script pour charger les détails de l'affaire et gérer les ajouts de notes -->
+<script>
+    const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+    const urlParams = new URLSearchParams(window.location.search);
+    const caseId = urlParams.get('id');
+
+    let cases = JSON.parse(localStorage.getItem('affaires')) || [];
+    let selectedCase = cases[caseId];
+
+    if (!selectedCase) {
+        document.body.innerHTML = "<h1>Affaire non trouvée</h1>";
+        return;
+    }
+
+    // Vérification du niveau d'accréditation
+    if (loggedInUser.accreditation !== 'admin' && parseInt(loggedInUser.accreditation) < parseInt(selectedCase.accreditation)) {
+        document.body.innerHTML = "<h1>Accès refusé. Vous n'avez pas le niveau d'accréditation requis.</h1>";
+        return;
+    }
+
+    // Afficher les détails de l'affaire
+    document.getElementById('case-title').textContent = selectedCase.name;
+    document.getElementById('case-accreditation').textContent = selectedCase.accreditation;
+    document.getElementById('case-creator').textContent = selectedCase.creator;
+    document.getElementById('case-date').textContent = new Date(selectedCase.creationDate).toLocaleString();
+    document.getElementById('case-details').textContent = selectedCase.details || "Pas de détails supplémentaires.";
+
+    // Charger les notes de l'affaire
+    const notesList = document.getElementById('notes-list');
+    let caseNotes = selectedCase.notes || [];
+    displayNotes();
+
+    function displayNotes() {
+        notesList.innerHTML = ''; // Vider la liste des notes
+        caseNotes.forEach(note => {
+            const noteDiv = document.createElement('div');
+            noteDiv.classList.add('note');
+            noteDiv.innerHTML = `
+                <p><strong>${note.author}</strong> (${new Date(note.timestamp).toLocaleString()})</p>
+                <p>${note.content}</p>
+            `;
+            notesList.appendChild(noteDiv);
+        });
+    }
+
+    // Ajouter une nouvelle note
+    document.getElementById('add-note-btn').addEventListener('click', function() {
+        const newNoteContent = document.getElementById('new-note').value;
+        if (!newNoteContent) {
+            alert("Veuillez écrire une note avant de l'ajouter.");
+            return;
+        }
+
+        const newNote = {
+            author: loggedInUser.username,
+            timestamp: new Date().toISOString(),
+            content: newNoteContent
+        };
+
+        caseNotes.push(newNote);
+        selectedCase.notes = caseNotes;
+        cases[caseId] = selectedCase;
+
+        // Mettre à jour l'affaire dans le localStorage
+        localStorage.setItem('affaires', JSON.stringify(cases));
+
+        // Vider le champ de saisie et réafficher les notes
+        document.getElementById('new-note').value = '';
+        displayNotes();
+    });
+</script>
+
+</body>
+</html>
