@@ -37,11 +37,29 @@
 
 <!-- Script pour gérer l'envoi des rapports -->
 <script>
-    function sendReport() {
-        // Récupérer les informations du formulaire
-        const user = document.getElementById('user-select').value;
-        const subject = document.getElementById('subject').value;
-        const body = document.getElementById('message-body').value;
+  function sendReport() {
+    // Récupérer les informations du formulaire
+    const user = document.getElementById('user-select').value;
+    const subject = document.getElementById('subject').value;
+    const body = document.getElementById('message-body').value;
+
+    // Créer un message
+    const message = {
+        subject: subject,
+        body: body
+    };
+
+    // Stocker le message dans la boîte de réception de l'utilisateur
+    const inbox = JSON.parse(localStorage.getItem(user + '_inbox')) || [];
+    inbox.push(message);
+    localStorage.setItem(user + '_inbox', JSON.stringify(inbox));
+
+    // Afficher la confirmation d'envoi
+    document.getElementById('confirmation-message').style.display = 'block';
+
+    // Réinitialiser le formulaire
+    document.getElementById('report-form').reset();
+}
 
         // Créer une image à partir du message (ici un simple alert pour la démo)
         alert(`Message envoyé à ${user}\nObjet: ${subject}\nCorps: ${body}`);
