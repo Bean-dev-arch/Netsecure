@@ -16,13 +16,21 @@
 <button onclick="goToInbox()">Accéder à ma boîte de réception</button>
 
 <script>
+    // Simule l'utilisateur connecté (tu devrais le récupérer lors de la connexion)
+    const loggedInUser = 'user1';  // Remplace par l'identifiant de l'utilisateur connecté
+    localStorage.setItem('loggedInUser', loggedInUser);
+
     // Fonction pour rediriger l'utilisateur vers sa boîte de réception
     function goToInbox() {
-        const currentUser = localStorage.getItem('loggedInUser');  // Récupère
+        const currentUser = localStorage.getItem('loggedInUser');  // Récupère l'utilisateur connecté depuis localStorage
+        if (currentUser) {
+            window.location.href = `inbox.html?user=${currentUser}`;  // Redirige vers la boîte de réception de l'utilisateur
+        } else {
+            alert("Aucun utilisateur connecté !");
+        }
+    }
+</script>
 
-    
-<a href="reports.html">Envoyer un rapport</a>
-    
 </body>
 </html>
 
